@@ -2,7 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="46b43225-fdcd-4277-9a21-19aadb0d24bf" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/DecisionTree (conflicted copy 2019-05-16 133645).py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DecisionTree.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/DecisionTreePruned.py" beforeDir="false" afterPath="$PROJECT_DIR$/DecisionTreePruned.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RandomForest.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/causal_tree.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/decisionnode.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/myDecisionTree.py" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -26,43 +33,13 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/DecisionTree.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="900">
-              <caret line="62" selection-end-line="224" />
-              <folding>
-                <element signature="e#0#19#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/DecisionTreePruned.py">
           <provider selected="true" editor-type-id="text-editor">
             <state>
-              <caret column="18" selection-start-column="18" selection-end-column="18" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/decisionnode.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="300">
-              <caret line="20" column="29" selection-start-line="20" selection-start-column="29" selection-end-line="20" selection-end-column="29" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/myDecisionTree.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="268">
-              <caret line="154" column="8" selection-start-line="154" selection-start-column="8" selection-end-line="154" selection-end-column="8" />
+              <caret line="222" column="28" selection-start-line="222" selection-start-column="28" selection-end-line="222" selection-end-column="28" />
               <folding>
-                <element signature="e#0#18#0" expanded="true" />
+                <element signature="e#0#19#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -198,22 +175,21 @@
       <workItem from="1557906758524" duration="13363000" />
       <workItem from="1557994970766" duration="19827000" />
       <workItem from="1558078431883" duration="1130000" />
-      <workItem from="1558081147253" duration="18843000" />
+      <workItem from="1558081147253" duration="31900000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="115917000" />
+    <option name="totallyTimeSpent" value="128974000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="27" width="1366" height="741" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" weight="0.04621212" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" weight="0.3295711" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.3283582" />
       <window_info anchor="bottom" id="Run" order="2" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
@@ -232,7 +208,7 @@
       <window_info anchor="right" id="R Packages" order="5" />
       <window_info anchor="right" id="Database" order="6" />
       <window_info anchor="right" x="0" y="0" width="120" height="541" id="Documentation" order="7" sideWeight="0.50790066" side_tool="true" weight="0.046266235" />
-      <window_info active="true" anchor="right" x="0" y="64" width="1366" height="704" id="Python Console" order="8" sideWeight="0.49209931" type="WINDOWED" visible="true" weight="0.24675325" />
+      <window_info active="true" anchor="right" x="0" y="64" width="1366" height="704" id="Python Console" maximized="true" order="8" sideWeight="0.49209931" type="WINDOWED" visible="true" weight="0.24675325" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -291,7 +267,10 @@
     <entry file="file://$PROJECT_DIR$/DecisionTreePruned.py">
       <provider selected="true" editor-type-id="text-editor">
         <state>
-          <caret column="18" selection-start-column="18" selection-end-column="18" />
+          <caret line="222" column="28" selection-start-line="222" selection-start-column="28" selection-end-line="222" selection-end-column="28" />
+          <folding>
+            <element signature="e#0#19#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

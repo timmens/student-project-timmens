@@ -14,6 +14,12 @@ Right now this is the most important file. It contains the class DecisionTreePru
 
 ### TODO 
 
-1. Implement Non Naive Pruning Function to get sequence of potentially optimally subtrees 
+1. Implement Non Naive Pruning Function to get sequence of potentially optimally subtrees [DONE] 
 2. Write Cross Validation Function that selects an optimal tree from a sequence of subtrees
 3. [Optimize Code] 
+
+
+### TOCHECK
+
+1. Check if I get any problems by not using deepcopy or np.copy 
+2. Check if all loss functions that are being used are defined equally; in particular len(y) * var(y) vs. var(y) 
