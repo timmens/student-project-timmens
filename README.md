@@ -9,7 +9,8 @@ In this project we try to understand the method (causal trees) presented in Athe
 3. Produce small simulation study which will compare the following methods in a heterogenous treatment setting
 * Classical treatment effect estimator which does **not** account for heterogeneity 
 * Classical treatment effect estimator which does account for heterogeneity
-* Causal Trees 
+* Causal Trees
+
 [4. Outlook how to get from Causal Trees to Causal Forests] 
 [5. Proofs of Theorems and Lemmata] 
 
