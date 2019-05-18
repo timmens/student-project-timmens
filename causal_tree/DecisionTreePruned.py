@@ -4,8 +4,9 @@ from sklearn.base import BaseEstimator, RegressorMixin
 
 
 class DecisionTreePruned(BaseEstimator, RegressorMixin):  # Inherits from sklearn to use their Cross Validation methods
-    # make sure that I do not change anything, because numpy uses copy by reference and not copy by value
+    # 1. make sure that I do not change anything, because numpy uses copy by reference and not copy by value
     # maybe should use deepcopy more often
+    # 2. implement method prune_non_naively
 
     def __init__(self, parent=None):  # , root=None):
         self._parent = parent
@@ -17,10 +18,12 @@ class DecisionTreePruned(BaseEstimator, RegressorMixin):  # Inherits from sklear
         self._split_var = None
         self._split_value = None
         self._loss = None
-        self._depth = 0
+        self._node_loss = None
+        self._branch_loss = None
         self._is_fitted = False
         self._feature_names = None
         self._num_features = None
+        self._y = None
 
     def __str__(self):
         if self._is_fitted is False:
@@ -28,18 +31,26 @@ class DecisionTreePruned(BaseEstimator, RegressorMixin):  # Inherits from sklear
         elif self._feature_names is not None:
             string_dict = {"Loss": self._loss,
                            "Splitting Variable (First split)": self._feature_names[self._split_var],
-                           "Splitting Value": self._split_value, "Tree Depth": self.tree_depth, "Estimate": self._value}
+                           "Splitting Value": self._split_value, "Tree Depth": self.depth, "Estimate": self._value}
         else:
             string_dict = {"Loss": self._loss, "Splitting Feature (First split)": self._split_var,
-                           "Splitting Value": self._split_value, "Tree Depth": self.tree_depth, "Estimate": self._value}
+                           "Splitting Value": self._split_value, "Tree Depth": self.depth, "Estimate": self._value}
         return dict.__str__(string_dict)
 
     #  Property and Setter Functions
     ###################################################################################################################
 
     @property
+    def y(self):
+        return self._y
+
+    @property
     def loss(self):
         return self._loss
+
+    @loss.setter
+    def loss(self, loss):
+        self._loss = loss
 
     @property
     def left_child(self):
@@ -49,8 +60,16 @@ class DecisionTreePruned(BaseEstimator, RegressorMixin):  # Inherits from sklear
     def right_child(self):
         return self._right_child
 
+    @right_child.setter
+    def right_child(self, node):
+        self._right_child = node
+
+    @left_child.setter
+    def left_child(self, node):
+        self._left_child = node
+
     @property
-    def tree_depth(self):
+    def depth(self):
         return DecisionTreePruned.detect_tree_depth(self)
 
     @property
@@ -68,6 +87,14 @@ class DecisionTreePruned(BaseEstimator, RegressorMixin):  # Inherits from sklear
     @property
     def value(self):
         return self._value
+
+    @property
+    def node_loss(self):
+        return self._node_loss
+
+    @property
+    def branch_loss(self):
+        return self._branch_loss
 
     # Various Auxiliary Functions
     ###################################################################################################################
@@ -96,16 +123,16 @@ class DecisionTreePruned(BaseEstimator, RegressorMixin):  # Inherits from sklear
         return leaf_list
 
     @staticmethod
-    def compute_loss(y, loss_func=None):
-        if loss_func is None:
-            loss = np.var(y)
+    def get_level_in_list(tree, level):
+        #  level: 0 -> root, 1 -> first layer, 2 -> ...
+        level_list = []
+        if level == 0:
+            level_list.append(tree)
         else:
-            loss = loss_func(y)
-
-        if loss is None:
-            raise ValueError("Loss function cannot be computed on the outcome vector.")
-        else:
-            return loss
+            if tree.left_child is not None:
+                level_list.extend(DecisionTreePruned.get_level_in_list(tree.left_child, level - 1))
+                level_list.extend(DecisionTreePruned.get_level_in_list(tree.right_child, level - 1))
+        return level_list
 
     @staticmethod
     def detect_tree_depth(tree):
@@ -116,17 +143,70 @@ class DecisionTreePruned(BaseEstimator, RegressorMixin):  # Inherits from sklear
         return max(depth_left, depth_right)
 
     @staticmethod
-    def coerce_to_ndarray(obj):
-        if isinstance(obj, np.ndarray):
-            return obj
-        elif isinstance(obj, (pd.Series, pd.DataFrame)):
-            return obj.values
-        else:
-            raise TypeError("Object was given with inappropriate type;"
-                            "for matrices and vectors only use pandas Series, DataFrame or Numpy ndarrays")
+    def collapse_node_if(parent_node):
+        parent_loss = compute_loss(parent_node.y)
+        children_loss = compute_loss(parent_node.left_child.y)
+        children_loss += compute_loss(parent_node.right_child.y)
+        if parent_loss <= children_loss:
+            parent_node.left_child = None
+            parent_node.right_child = None
+            parent_node.loss = compute_loss(parent_node.y)
+        return parent_node
 
     @staticmethod
-    def prune_tree(tree):
+    def collapse_node_non_naively(parent_node):
+        parent_loss = compute_loss(parent_node.y)
+        children_loss = compute_loss(parent_node.left_child.y)
+        children_loss += compute_loss(parent_node.right_child.y)
+        if parent_loss <= children_loss:
+            parent_node.left_child = None
+            parent_node.right_child = None
+            parent_node.loss = compute_loss(parent_node.y)
+        return parent_node
+
+    @staticmethod
+    def prune_tree(tree, regularizer):
+        depth = tree.depth
+        if depth < 1:
+            print("Nothing to prune here.")
+            return
+        for i in range(depth):
+            for parent_node in DecisionTreePruned.get_level_in_list(tree, depth-i-1):
+                if parent_node.left_child is not None:
+                    DecisionTreePruned.collapse_node_if(parent_node, regularizer)
+
+    @staticmethod
+    def validate(tree, X_test, y_test):
+        #  returns sum of squared residuals using the tree as estimator
+        y_pred = tree.predict(X_test)
+        return np.sum((y_test - y_pred)**2)
+
+    @staticmethod
+    def cost(tree):
+       return 1 # check if this is equal to loss
+
+    @staticmethod
+    def cost_complexity(tree, alpha):
+        assert alpha >= 0, "Cost-Complexity Parameter <<alpha>> has to be non-negative."
+        DecisionTreePruned.cost(tree) + alpha * len(DecisionTreePruned.get_leafs_in_list(tree))
+
+    @staticmethod
+    def prune_tree_non_naively(tree, X_test, y_test):
+        depth = tree.depth
+        if depth < 1:
+            print("Nothing to prune here.")
+            return
+        for i in range(depth):
+            for parent_node in DecisionTreePruned.get_level_in_list(tree, depth-i-1):
+                if parent_node.left_child is not None:
+                    DecisionTreePruned.collapse_node_non_naively(parent_node, X_test, y_test)
+
+    @staticmethod
+    def get_pruned_tree_and_alpha_sequence(tree):
+        #  1. Make sure that while fitting a tree every tree has the attributes R(t), R(T_t), |\tilde{T}_t|
+        #     for each node t in the tree, as well as update functions for the last two attributes
+        #  2. Compute the first Tree, i.e. T_1, set alpha_1 = 0
+        #  3. Construct sequence of trees and alphas.
         pass
 
     # Algorithm Implementation and Fitting Function
@@ -153,8 +233,8 @@ class DecisionTreePruned(BaseEstimator, RegressorMixin):  # Inherits from sklear
                 if xi == sorted_x[i + 1]:
                     continue
 
-                lhs_count, lhs_loss = i + 1, DecisionTreePruned.compute_loss(sorted_y[:(i + 1)])
-                rhs_count, rhs_loss = n - i - 1, DecisionTreePruned.compute_loss(sorted_y[(i + 1):])
+                lhs_count, lhs_loss = i + 1, compute_loss(sorted_y[:(i + 1)])
+                rhs_count, rhs_loss = n - i - 1, compute_loss(sorted_y[(i + 1):])
 
                 tmp_loss = lhs_count * lhs_loss + rhs_count * rhs_loss  # = SSE_left + SSE_right
 
@@ -169,11 +249,7 @@ class DecisionTreePruned(BaseEstimator, RegressorMixin):  # Inherits from sklear
         if self.is_root:
             assert min_leaf >= 1, "Parameter <<min_leaf>> has to be bigger than one."
             assert max_depth >= 1, "Parameter <<max_depth>> has to be bigger than one."
-            assert len(X) == len(y), "Data <<X>> and <<y>> must have to have the same number of observations."
-
-        # Set Parameters
-        self._min_leaf = min_leaf
-        self._value = np.mean(y)
+            assert len(X) == len(y), "Data <<X>> and <<y>> must have the same number of observations."
 
         # Do Stuff for Root
         if self.is_root:
@@ -182,9 +258,14 @@ class DecisionTreePruned(BaseEstimator, RegressorMixin):  # Inherits from sklear
             except:
                 pass
             # Coerce Input
-            X = DecisionTreePruned.coerce_to_ndarray(X)
-            y = DecisionTreePruned.coerce_to_ndarray(y)
+            X = coerce_to_ndarray(X)
+            y = coerce_to_ndarray(y)
             self._num_features = X.shape[1]
+
+        # Set Parameters
+        self._min_leaf = min_leaf
+        self._value = np.mean(y)
+        self._y = y
 
         # Actual Fitting
         self._split_var, self._split_value, self._loss = self.find_best_splitting_point(X, y)
@@ -212,6 +293,28 @@ class DecisionTreePruned(BaseEstimator, RegressorMixin):  # Inherits from sklear
     #  Pruning and Post-Fit-Overfitting Avoidance
     ###################################################################################################################
 
+    def return_subtrees(self):
+        pass
+
+    def prune(self, regularizer=0):
+        #  see above for actual implementation
+        DecisionTreePruned.prune_tree(self, regularizer=regularizer)
+        self.update_loss()
+
+    def non_naive_pruning(self, X_test, y_test):
+        pass
+
+    #  Cross Validation Functions and Co. FUCK IM ANGRY
+    ###################################################################################################################
+
+    def cost_complexity(self, X_train, y_train, alpha):
+        num_leafs = len(self.get_leafs_in_list())
+        return self.score(X_train, y_train) + alpha * num_leafs
+
+    def score(self, X, y, sample_weight=None):
+        y_pred = self.predict(X)
+        return np.mean((y - y_pred)**2)
+
     #  Prediction Functions
     ###################################################################################################################
 
@@ -222,9 +325,31 @@ class DecisionTreePruned(BaseEstimator, RegressorMixin):  # Inherits from sklear
         return child.predict_row(xi)
 
     def predict(self, x):
-        x = DecisionTreePruned.coerce_to_ndarray(x)
+        x = coerce_to_ndarray(x)
         assert self._is_fitted, "The tree has not yet been fitted; no prediction is possible."
         assert x.shape[1] == self._num_features, "New Data must have the same dimension as the Data used for Fitting."
 
         return np.array([self.predict_row(xi) for xi in x])
     ###################################################################################################################
+
+
+def coerce_to_ndarray(obj):
+    if isinstance(obj, np.ndarray):
+        return obj
+    elif isinstance(obj, (pd.Series, pd.DataFrame)):
+        return obj.values
+    else:
+        raise TypeError("Object was given with inappropriate type;"
+                        "for matrices and vectors only use pandas Series, DataFrame or Numpy ndarrays")
+
+
+def compute_loss(y, loss_func=None):
+    if loss_func is None:
+        loss = np.var(y)
+    else:
+        loss = loss_func(y)
+
+    if loss is None:
+        raise ValueError("Loss function cannot be computed on the outcome vector.")
+    else:
+        return loss
