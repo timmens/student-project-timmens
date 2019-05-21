@@ -23,3 +23,7 @@ Right now this is the most important file. It contains the class DecisionTreePru
 
 1. Check if I get any problems by not using deepcopy or np.copy 
 2. Check if all loss functions that are being used are defined equally; in particular len(y) * var(y) vs. var(y) 
+
+### Notes 
+
+- Cannot use Cross Validation from Sklearn since DecisionTree cross validation is inherently different compared to other cv strategies (or is it, maybe check that one again!)

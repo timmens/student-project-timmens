@@ -1,11 +1,10 @@
 import pandas as pd
 import numpy as np
 from copy import deepcopy
-from sklearn.base import BaseEstimator, RegressorMixin
+import sklearn
 
 
-class DecisionTreePruned:  # BaseEstimator, RegressorMixin):
-    # Inherits from sklearn to use their Cross Validation methods
+class DecisionTreePruned:
     # 1. make sure that I do not change anything, because numpy uses copy by reference and not copy by value
     # maybe should use deepcopy more often
     # 2. implement method prune_non_naively
@@ -180,70 +179,62 @@ class DecisionTreePruned:  # BaseEstimator, RegressorMixin):
             parent_node.loss = compute_loss(parent_node.y)
         return parent_node
 
-   # @staticmethod
-   # def prune_tree(tree, regularizer):
-   #     depth = tree.depth
-   #     if depth < 1:
-   #         print("Nothing to prune here.")
-   #         return
-   #     for i in range(depth):
-   #         for parent_node in DecisionTreePruned.get_level_in_list(tree, depth-i-1):
-   #             if parent_node.left_child is not None:
-   #                 DecisionTreePruned.collapse_node_if(parent_node, regularizer)
+    #@staticmethod
+    #def validate(tree, X_test, y_test):
+    #    #  returns sum of squared residuals using the tree as estimator
+    #    y_pred = tree.predict(X_test)
+    #    return np.sum((y_test - y_pred)**2)
+
+    #@staticmethod
+    #def cost(tree):
+    #   return 1 # check if this is equal to loss
+
+    #@staticmethod
+    #def cost_complexity(tree, alpha):
+    #    assert alpha >= 0, "Cost-Complexity Parameter <<alpha>> has to be non-negative."
+    #    DecisionTreePruned.cost(tree) + alpha * len(DecisionTreePruned.get_leafs_in_list(tree))
 
     @staticmethod
-    def validate(tree, X_test, y_test):
-        #  returns sum of squared residuals using the tree as estimator
-        y_pred = tree.predict(X_test)
-        return np.sum((y_test - y_pred)**2)
-
-    @staticmethod
-    def cost(tree):
-       return 1 # check if this is equal to loss
-
-    @staticmethod
-    def cost_complexity(tree, alpha):
-        assert alpha >= 0, "Cost-Complexity Parameter <<alpha>> has to be non-negative."
-        DecisionTreePruned.cost(tree) + alpha * len(DecisionTreePruned.get_leafs_in_list(tree))
-
-    @staticmethod
-    def prune_tree_non_naively(tree, X_test, y_test):
-        depth = tree.depth
+    def prune_tree_non_naively(fitted_tree, X_test, y_test):
+        depth = fitted_tree.depth
         if depth < 1:
             print("Nothing to prune here.")
             return
         for i in range(depth):
-            for parent_node in DecisionTreePruned.get_level_in_list(tree, depth-i-1):
+            for parent_node in DecisionTreePruned.get_level_in_list(fitted_tree, depth-i-1):
                 if parent_node.left_child is not None:
                     DecisionTreePruned.collapse_node_non_naively(parent_node, X_test, y_test)
 
     @staticmethod
-    def get_first_subtree(tree):
-        subtree = deepcopy(tree)
+    def get_first_subtree(fitted_tree, thresh=None):
+        subtree = deepcopy(fitted_tree)
+        if thresh is None:
+            thresh = np.sqrt(np.var(subtree.y)) / 50
         depth = subtree.depth
         if depth < 1:
             return subtree
         for i in range(depth):
             for parent_node in DecisionTreePruned.get_level_in_list(subtree, depth-i-1):
                 if parent_node.left_child is not None:
-                    if parent_node.node_loss <= parent_node.left_child.node_loss + parent_node.right_child.node_loss:
+                    if parent_node.node_loss <= parent_node.left_child.node_loss + \
+                            parent_node.right_child.node_loss + thresh:
                         parent_node.left_child, parent_node.right_child = None, None
         return subtree
 
     @staticmethod
-    def get_pruned_tree_and_alpha_sequence(tree):
+    def get_pruned_tree_and_alpha_sequence(fitted_tree):
         #  let tree be the node in question, i.e. tree = t
         #  then R(t)   = tree.node_loss
         #       R(T_t) = tree.branch_loss (gets updated automatically when called)
         #       |T_t|  = tree.number_of_leafs (gets updated automatically when called)
         #  2. Compute the first Tree, i.e. T_1, set alpha_1 = 0
         #  3. Construct sequence of trees and alphas.
-        assert isinstance(tree, DecisionTreePruned), 'This method only works on Decision Trees'
-        if not tree.is_fitted:
+        assert isinstance(fitted_tree, DecisionTreePruned), 'This method only works on Decision Trees'
+        if not fitted_tree.is_fitted:
             raise ValueError('This method only works on fitted trees')
 
         alphas = [0]
-        subtrees = [DecisionTreePruned.get_first_subtree(tree)]  # get_first_subtree() does deepcopy
+        subtrees = [DecisionTreePruned.get_first_subtree(fitted_tree)]  # get_first_subtree() does deepcopy
 
         index = 0
         while not subtrees[index].is_root:
@@ -257,6 +248,55 @@ class DecisionTreePruned:  # BaseEstimator, RegressorMixin):
             index += 1
 
         return {'alphas': alphas, 'subtrees': subtrees}
+
+    @staticmethod
+    def get_subtree_corresponding_to_arbitrary_alpha(tree, alpha):
+        sequences = DecisionTreePruned.get_pruned_tree_and_alpha_sequence(tree)
+        alphas = sequences['alphas']
+        subtrees = sequences['subtrees']
+        alphas = np.array(alphas)
+        if alpha >= alphas[-1]:
+            return subtrees[-1]
+        else:
+            index = np.where(alphas > alpha)[0][0]
+            return subtrees[index]
+
+    @staticmethod
+    def get_optimal_subtree_via_k_fold_cv(fitted_tree, X_learn, y_learn, k):
+        #  Here <<X_learn>> and <<y_learn>> were used to get <<fitted_tree>>
+
+        kf = sklearn.model_selection.KFold(k)
+        tree_max = fitted_tree  # complete maximal tree
+        tree_max_sequences = DecisionTreePruned.get_pruned_tree_and_alpha_sequence(tree_max)
+        tree_k_max_list = []  # list of maximal trees in each cross validation sample
+        tree_k_subtree_dict = []
+
+        for train_index, _ in kf.split(X_learn, y_learn):
+            tmp_tree = DecisionTreePruned()
+            tmp_tree.fit(X_learn[train_index], y_learn[train_index])
+            tree_k_max_list.append(tmp_tree)
+
+        for tree in tree_k_max_list:
+            tree_k_subtree_dict.append(DecisionTreePruned.get_pruned_tree_and_alpha_sequence(tree))
+
+        alphas = tree_max_sequences['alphas']
+        potential_subtrees = tree_max_sequences['subtrees']
+
+        alpha_cv_erros = []
+        for alpha in alphas:
+            err_alpha = 0
+            for cv_tree in range(k):
+                #  compute testing error of cv_tree_k subtree for given alpha on testing data set
+                #  add this error to err_alpha
+                something = 1 # needs to be computed here
+                err_alpha += something
+            alpha_cv_erros.append(err_alpha / k)
+
+
+
+        sequences = DecisionTreePruned.get_pruned_tree_and_alpha_sequence(fitted_tree)
+        alphas = sequences['alphas']
+        subtrees = sequences['subtrees']
 
     # Algorithm Implementation and Fitting Function
     ###################################################################################################################
