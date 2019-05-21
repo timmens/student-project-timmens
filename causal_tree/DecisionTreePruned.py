@@ -179,20 +179,14 @@ class DecisionTreePruned:
             parent_node.loss = compute_loss(parent_node.y)
         return parent_node
 
-    #@staticmethod
-    #def validate(tree, X_test, y_test):
-    #    #  returns sum of squared residuals using the tree as estimator
-    #    y_pred = tree.predict(X_test)
-    #    return np.sum((y_test - y_pred)**2)
-
-    #@staticmethod
-    #def cost(tree):
-    #   return 1 # check if this is equal to loss
-
-    #@staticmethod
-    #def cost_complexity(tree, alpha):
-    #    assert alpha >= 0, "Cost-Complexity Parameter <<alpha>> has to be non-negative."
-    #    DecisionTreePruned.cost(tree) + alpha * len(DecisionTreePruned.get_leafs_in_list(tree))
+    @staticmethod
+    def validate(tree, X_test, y_test, metric=None):
+        #  returns validation metric on predicted and true outcomes
+        if metric is None:
+            def metric(pred, true):
+                return np.mean((pred - true)**2)
+        y_pred = tree.predict(X_test)
+        return np.mean(metric(y_pred, y_test))
 
     @staticmethod
     def prune_tree_non_naively(fitted_tree, X_test, y_test):
@@ -270,11 +264,15 @@ class DecisionTreePruned:
         tree_max_sequences = DecisionTreePruned.get_pruned_tree_and_alpha_sequence(tree_max)
         tree_k_max_list = []  # list of maximal trees in each cross validation sample
         tree_k_subtree_dict = []
+        test_X = []
+        test_y = []
 
-        for train_index, _ in kf.split(X_learn, y_learn):
+        for train_index, test_index in kf.split(X_learn, y_learn):
             tmp_tree = DecisionTreePruned()
             tmp_tree.fit(X_learn[train_index], y_learn[train_index])
             tree_k_max_list.append(tmp_tree)
+            test_X.append(X_learn[test_index])
+            test_y.append(y_learn[test_index])
 
         for tree in tree_k_max_list:
             tree_k_subtree_dict.append(DecisionTreePruned.get_pruned_tree_and_alpha_sequence(tree))
@@ -282,21 +280,19 @@ class DecisionTreePruned:
         alphas = tree_max_sequences['alphas']
         potential_subtrees = tree_max_sequences['subtrees']
 
-        alpha_cv_erros = []
+        alpha_cv_errors = []
         for alpha in alphas:
             err_alpha = 0
-            for cv_tree in range(k):
-                #  compute testing error of cv_tree_k subtree for given alpha on testing data set
-                #  add this error to err_alpha
-                something = 1 # needs to be computed here
-                err_alpha += something
-            alpha_cv_erros.append(err_alpha / k)
+            for k, cv_tree in enumerate(tree_k_max_list):
+                cv_alpha_subtree = DecisionTreePruned.get_subtree_corresponding_to_arbitrary_alpha(cv_tree, alpha)
+                err_alpha += DecisionTreePruned.validate(cv_alpha_subtree, test_X[k], test_y[k])
 
+            alpha_cv_errors.append(err_alpha / k)
 
-
-        sequences = DecisionTreePruned.get_pruned_tree_and_alpha_sequence(fitted_tree)
-        alphas = sequences['alphas']
-        subtrees = sequences['subtrees']
+        alpha_cv_errors = np.array(alpha_cv_errors)
+        optimal_index = int(np.where(alpha_cv_errors == alpha_cv_errors.min()))
+        optimal_subtree = potential_subtrees[optimal_index]
+        return optimal_subtree
 
     # Algorithm Implementation and Fitting Function
     ###################################################################################################################

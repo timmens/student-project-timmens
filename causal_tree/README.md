@@ -15,7 +15,7 @@ Right now this is the most important file. It contains the class DecisionTreePru
 ### TODO 
 
 1. Implement Non Naive Pruning Function to get sequence of potentially optimally subtrees [DONE] 
-2. Write Cross Validation Function that selects an optimal tree from a sequence of subtrees
+2. Write Cross Validation Function that selects an optimal tree from a sequence of subtrees [DONE]
 3. [Optimize Code] 
 
 
@@ -23,7 +23,11 @@ Right now this is the most important file. It contains the class DecisionTreePru
 
 1. Check if I get any problems by not using deepcopy or np.copy 
 2. Check if all loss functions that are being used are defined equally; in particular len(y) * var(y) vs. var(y) 
+3. Check new implementations (pruning and optimal pruned subtree) 
 
 ### Notes 
 
 - Cannot use Cross Validation from Sklearn since DecisionTree cross validation is inherently different compared to other cv strategies (or is it, maybe check that one again!)
+
+
+### TESTING (List of new problems) 
