@@ -1,5 +1,4 @@
 import numpy as np
-from pandas import DataFrame, Series
 
 
 def simulate_data(agents=100):
@@ -14,6 +13,4 @@ def simulate_data(agents=100):
     y[np.apply_along_axis(lambda boo: boo[0] and not boo[1], 1, index)] = 1
     y[np.apply_along_axis(lambda boo: not boo[0] and boo[1], 1, index)] = 3
 
-    x_col_names = ['Y', 'X1', 'X2']
-    df = DataFrame(np.column_stack((y, x)), columns=x_col_names)
     return x, y

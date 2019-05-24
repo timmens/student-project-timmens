@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 from copy import deepcopy
-import sklearn
+from sklearn.model_selection import KFold
 
 
 class DecisionTreePruned:
@@ -112,7 +112,7 @@ class DecisionTreePruned:
 
     def update_branch_loss(self):
         leaf_list = DecisionTreePruned.get_leafs_in_list(self)
-        loss_array = np.array([leaf.branch_loss for leaf in leaf_list])
+        loss_array = np.array([leaf.node_loss for leaf in leaf_list])
         self._branch_loss = np.sum(loss_array)
 
     def output_partition_estimates(self):
@@ -157,47 +157,48 @@ class DecisionTreePruned:
             depth_right += 1 + DecisionTreePruned.detect_tree_depth(tree.right_child)
         return max(depth_left, depth_right)
 
-    @staticmethod
-    def collapse_node_if(parent_node):
-        parent_loss = compute_loss(parent_node.y)
-        children_loss = compute_loss(parent_node.left_child.y)
-        children_loss += compute_loss(parent_node.right_child.y)
-        if parent_loss <= children_loss:
-            parent_node.left_child = None
-            parent_node.right_child = None
-            parent_node.loss = compute_loss(parent_node.y)
-        return parent_node
+    #@staticmethod
+    #def collapse_node_if(parent_node):
+    #    parent_loss = compute_loss(parent_node.y)
+    #    children_loss = compute_loss(parent_node.left_child.y)
+    #    children_loss += compute_loss(parent_node.right_child.y)
+    #    if parent_loss <= children_loss:
+    #        parent_node.left_child = None
+    #        parent_node.right_child = None
+    #        parent_node.loss = compute_loss(parent_node.y)
+    #    return parent_node
 
-    @staticmethod
-    def collapse_node_non_naively(parent_node):
-        parent_loss = compute_loss(parent_node.y)
-        children_loss = compute_loss(parent_node.left_child.y)
-        children_loss += compute_loss(parent_node.right_child.y)
-        if parent_loss <= children_loss:
-            parent_node.left_child = None
-            parent_node.right_child = None
-            parent_node.loss = compute_loss(parent_node.y)
-        return parent_node
+    #@staticmethod
+    #def collapse_node_non_naively(parent_node):
+    #    parent_loss = compute_loss(parent_node.y)
+    #    children_loss = compute_loss(parent_node.left_child.y)
+    #    children_loss += compute_loss(parent_node.right_child.y)
+    #    if parent_loss <= children_loss:
+    #        parent_node.left_child = None
+    #        parent_node.right_child = None
+    #        parent_node.loss = compute_loss(parent_node.y)
+    #    return parent_node
 
     @staticmethod
     def validate(tree, X_test, y_test, metric=None):
-        #  returns validation metric on predicted and true outcomes
+        #  returns assumed validation metric on predicted and true outcomes
         if metric is None:
             def metric(pred, true):
-                return np.mean((pred - true)**2)
+                return np.mean((pred - true)**2)  # if no metric is given Mean Squared Error is used (MSE)
         y_pred = tree.predict(X_test)
         return np.mean(metric(y_pred, y_test))
 
-    @staticmethod
-    def prune_tree_non_naively(fitted_tree, X_test, y_test):
-        depth = fitted_tree.depth
-        if depth < 1:
-            print("Nothing to prune here.")
-            return
-        for i in range(depth):
-            for parent_node in DecisionTreePruned.get_level_in_list(fitted_tree, depth-i-1):
-                if parent_node.left_child is not None:
-                    DecisionTreePruned.collapse_node_non_naively(parent_node, X_test, y_test)
+    #@staticmethod
+    #def prune_tree_non_naively(fitted_tree, X_test, y_test):
+
+    #    depth = fitted_tree.depth
+    #    if depth < 1:
+    #        print("Nothing to prune here.")
+    #        return
+    #    for i in range(depth):
+    #        for parent_node in DecisionTreePruned.get_level_in_list(fitted_tree, depth-i-1):
+    #            if parent_node.left_child is not None:
+    #                DecisionTreePruned.collapse_node_non_naively(parent_node, X_test, y_test)
 
     @staticmethod
     def get_first_subtree(fitted_tree, thresh=None):
@@ -225,23 +226,28 @@ class DecisionTreePruned:
         #  3. Construct sequence of trees and alphas.
         assert isinstance(fitted_tree, DecisionTreePruned), 'This method only works on Decision Trees'
         if not fitted_tree.is_fitted:
-            raise ValueError('This method only works on fitted trees')
+            raise ValueError('This method only works on fitted trees')  # here we throw an error instead of using
+            # assert since this error can be solved by fitting the tree and then calling the function again
 
         alphas = [0]
         subtrees = [DecisionTreePruned.get_first_subtree(fitted_tree)]  # get_first_subtree() does deepcopy
 
         index = 0
-        while not subtrees[index].is_root:
+        while subtrees[index].left_child is not None:
             tmp_argmin, tmp_min = g(subtrees[index])
             tmp_subtree = deepcopy(subtrees[index])
             alphas.append(tmp_min)
-            for node in tmp_min:
+            for node in tmp_argmin:
                 node.left_child = None
                 node.right_child = None
             subtrees.insert(index, tmp_subtree)
             index += 1
 
-        return {'alphas': alphas, 'subtrees': subtrees}
+        if not test_monotonicity_list(alphas) and not test_monotonicity_list(alphas, strictly=False):
+            raise RuntimeError('Sequence of alphas is not increasing')
+        if not test_monotonicity_list(alphas):
+            print("Sequence of alphas is only weakly increasing.")
+        return {'alphas': alphas, 'subtrees': subtrees}  # i think i want: return alphas, subtrees
 
     @staticmethod
     def get_subtree_corresponding_to_arbitrary_alpha(tree, alpha):
@@ -259,7 +265,7 @@ class DecisionTreePruned:
     def get_optimal_subtree_via_k_fold_cv(fitted_tree, X_learn, y_learn, k):
         #  Here <<X_learn>> and <<y_learn>> were used to get <<fitted_tree>>
 
-        kf = sklearn.model_selection.KFold(k)
+        kf = KFold(k)
         tree_max = fitted_tree  # complete maximal tree
         tree_max_sequences = DecisionTreePruned.get_pruned_tree_and_alpha_sequence(tree_max)
         tree_k_max_list = []  # list of maximal trees in each cross validation sample
@@ -290,11 +296,11 @@ class DecisionTreePruned:
             alpha_cv_errors.append(err_alpha / k)
 
         alpha_cv_errors = np.array(alpha_cv_errors)
-        optimal_index = int(np.where(alpha_cv_errors == alpha_cv_errors.min()))
+        optimal_index = int(np.where(alpha_cv_errors == alpha_cv_errors.min())[0])
         optimal_subtree = potential_subtrees[optimal_index]
         return optimal_subtree
 
-    # Algorithm Implementation and Fitting Function
+    # Algorithm Implementation and Fitting Functions
     ###################################################################################################################
 
     def find_best_splitting_point(self, X, y):
@@ -329,12 +335,13 @@ class DecisionTreePruned:
         return split_index, split_value, loss
 
     def fit(self, X, y, min_leaf=5, max_depth=10):
-
         # Check Input Values
         if self.is_root:
             assert min_leaf >= 1, "Parameter <<min_leaf>> has to be bigger than one."
-            assert max_depth >= 1, "Parameter <<max_depth>> has to be bigger than one."
+            assert max_depth >= 1, "Parameter <<max_depth>> has to be bigger or equal than one."
             assert len(X) == len(y), "Data <<X>> and <<y>> must have the same number of observations."
+            assert len(y) >= 2 * min_leaf, "Data has not enough observations for a single split to occur " \
+                                           "given value of <<min_leaf>>."
 
         # Do Stuff for Root
         if self.is_root:
@@ -342,8 +349,7 @@ class DecisionTreePruned:
                 self._feature_names = X.columns.values
             except AttributeError:
                 pass
-            # Coerce Input
-            X = coerce_to_ndarray(X)
+            X = coerce_to_ndarray(X)  # coerce to ndarray (since all following functions expect numpy arrays)
             y = coerce_to_ndarray(y)
             self._num_features = X.shape[1]
 
@@ -351,7 +357,7 @@ class DecisionTreePruned:
         self._min_leaf = min_leaf
         self._value = np.mean(y)
         self._y = y
-        self._node_loss = len(y) * np.var(y)
+        self._node_loss = np.sum((self._y - self._value)**2)  # = sum of squared residuals when predicting the mean
 
         # Actual Fitting
         self._split_var, self._split_value, tmp_loss = self.find_best_splitting_point(X, y)
@@ -362,45 +368,32 @@ class DecisionTreePruned:
         else:
             self._branch_loss = tmp_loss
 
-        if self._split_var is not None and max_depth > 0:
+        if self._split_var is not None and max_depth >= 1:
             index = X[:, self._split_var] <= self._split_value
-            x_left, y_left = X[index], y[index]
-            x_right, y_right = X[~index], y[~index]
+            #x_left, y_left = X[index], y[index]
+            #x_right, y_right = X[~index], y[~index]
+            #self._left_child.fit(x_left, y_left, min_leaf, max_depth-1)
+            #self._right_child.fit(x_right, y_right, min_leaf, max_depth-1)
 
             self._left_child = DecisionTreePruned(parent=self)
             self._right_child = DecisionTreePruned(parent=self)
 
-            # do i need to call any other functions ???
-            self._left_child.fit(x_left, y_left, min_leaf, max_depth-1)
-            self._right_child.fit(x_right, y_right, min_leaf, max_depth-1)
+            self._left_child.fit(X[index], y[index], min_leaf, max_depth-1)
+            self._right_child.fit(X[~index], y[~index], min_leaf, max_depth-1)
 
         self.update_branch_loss()
         return self
 
-    #  Pruning Algorithm
-    ###################################################################################################################
-
-    def return_subtrees(self):
-        pass
-
-    def prune(self, regularizer=0):
-        #  see above for actual implementation
-        DecisionTreePruned.prune_tree(self, regularizer=regularizer)
-        self.update_branch_loss()
-
-    def non_naive_pruning(self, X_test, y_test):
-        pass
-
     #  Cross Validation Functions and Co. FUCK IM ANGRY
     ###################################################################################################################
 
-    def cost_complexity(self, X_train, y_train, alpha):
-        num_leafs = len(self.get_leafs_in_list())
-        return self.score(X_train, y_train) + alpha * num_leafs
+    #def cost_complexity(self, X_train, y_train, alpha):
+    #    num_leafs = len(self.get_leafs_in_list())
+    #    return self.score(X_train, y_train) + alpha * num_leafs
 
-    def score(self, X, y, sample_weight=None):
-        y_pred = self.predict(X)
-        return np.mean((y - y_pred)**2)
+    #def score(self, X, y, sample_weight=None):
+    #    y_pred = self.predict(X)
+    #    return np.mean((y - y_pred)**2)
 
     #  Prediction Functions
     ###################################################################################################################
@@ -470,3 +463,10 @@ def compute_loss(y, loss_func=None) -> float:
         raise ValueError("Loss function cannot be computed on the outcome vector.")
     else:
         return loss
+
+
+def test_monotonicity_list(lst: list, strictly=True) -> bool:
+    if strictly:
+        return all(x < y for x, y in zip(lst, lst[1:]))
+    else:
+        return all(x <= y for x, y in zip(lst, lst[1:]))

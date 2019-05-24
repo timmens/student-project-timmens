@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="46b43225-fdcd-4277-9a21-19aadb0d24bf" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DecisionTreePruned.py" beforeDir="false" afterPath="$PROJECT_DIR$/DecisionTreePruned.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/simulate_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/simulate_data.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -29,8 +31,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/DecisionTreePruned.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state>
-              <caret line="103" selection-start-line="103" selection-end-line="103" />
+            <state relative-caret-position="525">
+              <caret line="373" column="4" selection-start-line="373" selection-start-column="4" selection-end-line="373" selection-end-column="4" />
               <folding>
                 <element signature="e#0#19#0" expanded="true" />
               </folding>
@@ -41,11 +43,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/simulate_data.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="255">
-              <caret line="18" column="14" selection-start-line="18" selection-start-column="14" selection-end-line="18" selection-end-column="14" />
-              <folding>
-                <element signature="e#0#18#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="210">
+              <caret line="14" selection-start-line="14" selection-end-line="14" />
             </state>
           </provider>
         </entry>
@@ -58,6 +57,11 @@
         <option value="Python Script" />
       </list>
     </option>
+  </component>
+  <component name="FindInProjectRecents">
+    <replaceStrings>
+      <replace />
+    </replaceStrings>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
@@ -73,16 +77,16 @@
         <option value="$PROJECT_DIR$/myDecisionTree.py" />
         <option value="$PROJECT_DIR$/small_simulation.py" />
         <option value="$PROJECT_DIR$/DecisionTree.py" />
-        <option value="$PROJECT_DIR$/simulate_data.py" />
         <option value="$PROJECT_DIR$/dtree.py" />
         <option value="$PROJECT_DIR$/decisionnode.py" />
+        <option value="$PROJECT_DIR$/simulate_data.py" />
         <option value="$PROJECT_DIR$/DecisionTreePruned.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
     <option name="y" value="27" />
-    <option name="width" value="1366" />
+    <option name="width" value="683" />
     <option name="height" value="741" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -170,12 +174,13 @@
       <workItem from="1558078431883" duration="1130000" />
       <workItem from="1558081147253" duration="31900000" />
       <workItem from="1558252245367" duration="1942000" />
-      <workItem from="1558426191486" duration="7459000" />
+      <workItem from="1558426191486" duration="8316000" />
+      <workItem from="1558687679460" duration="7977000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="138375000" />
+    <option name="totallyTimeSpent" value="147209000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="27" width="1366" height="741" extended-state="6" />
@@ -202,9 +207,9 @@
       <window_info anchor="right" id="SciView" order="3" sideWeight="0.49295774" weight="0.046969697" />
       <window_info anchor="right" id="R Graphics" order="4" sideWeight="0.49917626" weight="0.32954547" />
       <window_info anchor="right" id="R Packages" order="5" />
-      <window_info anchor="right" id="Database" order="6" />
-      <window_info anchor="right" x="0" y="0" width="120" height="541" id="Documentation" order="7" sideWeight="0.50790066" side_tool="true" visible="true" weight="0.04552352" />
-      <window_info active="true" anchor="right" x="0" y="64" width="1366" height="704" id="Python Console" maximized="true" order="8" sideWeight="0.49209931" type="WINDOWED" visible="true" weight="0.24675325" />
+      <window_info anchor="right" x="0" y="0" width="120" height="541" id="Documentation" order="6" sideWeight="0.50082916" side_tool="true" visible="true" weight="0.02276176" />
+      <window_info active="true" anchor="right" x="0" y="64" width="1366" height="704" id="Python Console" maximized="true" order="7" sideWeight="0.49209931" type="WINDOWED" visible="true" weight="0.24675325" />
+      <window_info anchor="right" id="Database" order="8" sideWeight="0.4991708" visible="true" weight="0.02276176" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -226,22 +231,19 @@
     <entry file="file://$PROJECT_DIR$/DecisionTree.py" />
     <entry file="file://$PROJECT_DIR$/myDecisionTree.py" />
     <entry file="file://$PROJECT_DIR$/decisionnode.py" />
-    <entry file="file://$PROJECT_DIR$/DecisionTreePruned.py">
+    <entry file="file://$PROJECT_DIR$/simulate_data.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret line="103" selection-start-line="103" selection-end-line="103" />
-          <folding>
-            <element signature="e#0#19#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="210">
+          <caret line="14" selection-start-line="14" selection-end-line="14" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/simulate_data.py">
+    <entry file="file://$PROJECT_DIR$/DecisionTreePruned.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="18" column="14" selection-start-line="18" selection-start-column="14" selection-end-line="18" selection-end-column="14" />
+        <state relative-caret-position="525">
+          <caret line="373" column="4" selection-start-line="373" selection-start-column="4" selection-end-line="373" selection-end-column="4" />
           <folding>
-            <element signature="e#0#18#0" expanded="true" />
+            <element signature="e#0#19#0" expanded="true" />
           </folding>
         </state>
       </provider>
