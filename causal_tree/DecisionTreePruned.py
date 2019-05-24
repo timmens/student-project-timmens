@@ -1,5 +1,7 @@
 import pandas as pd
 import numpy as np
+# from IPython.display import Image, display
+from graphviz import Graph
 from copy import deepcopy
 from sklearn.model_selection import KFold
 
@@ -7,7 +9,6 @@ from sklearn.model_selection import KFold
 class DecisionTreePruned:
     # 1. make sure that I do not change anything, because numpy uses copy by reference and not copy by value
     # maybe should use deepcopy more often
-    # 2. implement method prune_non_naively
 
     def __init__(self, parent=None):
         self._parent = parent
@@ -17,7 +18,6 @@ class DecisionTreePruned:
         self._min_leaf = None
         self._split_var = None
         self._split_value = None
-        self._loss = None
         self._node_loss = None
         self._branch_loss = None
         self._is_fitted = False
@@ -27,14 +27,14 @@ class DecisionTreePruned:
 
     def __str__(self):
         if self._is_fitted is False:
-            string_dict = {"Loss": self._loss, "Estimate": self._value}
+            string_dict = {"Loss": self.branch_loss, "Estimate": self.value}
         elif self._feature_names is not None:
-            string_dict = {"Loss": self._loss,
+            string_dict = {"Loss": self.branch_loss,
                            "Splitting Variable (First split)": self._feature_names[self._split_var],
-                           "Splitting Value": self._split_value, "Tree Depth": self.depth, "Estimate": self._value}
+                           "Splitting Value": self._split_value, "Tree Depth": self.depth, "Estimate": self.value}
         else:
-            string_dict = {"Loss": self._loss, "Splitting Feature (First split)": self._split_var,
-                           "Splitting Value": self._split_value, "Tree Depth": self.depth, "Estimate": self._value}
+            string_dict = {"Loss": self.branch_loss, "Splitting Feature (First split)": self._split_var,
+                           "Splitting Value": self._split_value, "Tree Depth": self.depth, "Estimate": self.value}
         return dict.__str__(string_dict)
 
     #  Property and Setter Functions
@@ -45,12 +45,8 @@ class DecisionTreePruned:
         return self._y
 
     @property
-    def loss(self):
-        return self._loss
-
-    @loss.setter
-    def loss(self, loss):
-        self._loss = loss
+    def parent(self):
+        return self._parent
 
     @property
     def left_child(self):
@@ -67,6 +63,15 @@ class DecisionTreePruned:
     @left_child.setter
     def left_child(self, node):
         self._left_child = node
+
+    @property
+    def feature_names(self):
+        return self._feature_names
+
+    @feature_names.setter
+    def feature_names(self, value):
+        if self.feature_names is None:
+            self._feature_names = value
 
     @property
     def depth(self):
@@ -118,7 +123,16 @@ class DecisionTreePruned:
     def output_partition_estimates(self):
         leaf_list = DecisionTreePruned.get_leafs_in_list(self)
         for i, leaf in enumerate(leaf_list):
-            print("Leaf {:d}; Estimate: {:3.03f}".format(i, leaf.value))
+            print('Leaf {:d}; Estimate: {:3.03f}'.format(i, leaf.value))
+
+    def splitting_info_to_string(self):
+        if self.left_child is None:
+            return ''
+        else:
+            if self._feature_names is None:
+                return 'Variable %d <= %3.3f' % (self._split_var, self._split_value)
+            else:
+                return '%s <= %3.3f' % (self._feature_names[self._split_var], self._split_value)
 
     # Static Methods (Some of which should probably not be static methods)
     ###################################################################################################################
@@ -157,28 +171,6 @@ class DecisionTreePruned:
             depth_right += 1 + DecisionTreePruned.detect_tree_depth(tree.right_child)
         return max(depth_left, depth_right)
 
-    #@staticmethod
-    #def collapse_node_if(parent_node):
-    #    parent_loss = compute_loss(parent_node.y)
-    #    children_loss = compute_loss(parent_node.left_child.y)
-    #    children_loss += compute_loss(parent_node.right_child.y)
-    #    if parent_loss <= children_loss:
-    #        parent_node.left_child = None
-    #        parent_node.right_child = None
-    #        parent_node.loss = compute_loss(parent_node.y)
-    #    return parent_node
-
-    #@staticmethod
-    #def collapse_node_non_naively(parent_node):
-    #    parent_loss = compute_loss(parent_node.y)
-    #    children_loss = compute_loss(parent_node.left_child.y)
-    #    children_loss += compute_loss(parent_node.right_child.y)
-    #    if parent_loss <= children_loss:
-    #        parent_node.left_child = None
-    #        parent_node.right_child = None
-    #        parent_node.loss = compute_loss(parent_node.y)
-    #    return parent_node
-
     @staticmethod
     def validate(tree, X_test, y_test, metric=None):
         #  returns assumed validation metric on predicted and true outcomes
@@ -187,18 +179,6 @@ class DecisionTreePruned:
                 return np.mean((pred - true)**2)  # if no metric is given Mean Squared Error is used (MSE)
         y_pred = tree.predict(X_test)
         return np.mean(metric(y_pred, y_test))
-
-    #@staticmethod
-    #def prune_tree_non_naively(fitted_tree, X_test, y_test):
-
-    #    depth = fitted_tree.depth
-    #    if depth < 1:
-    #        print("Nothing to prune here.")
-    #        return
-    #    for i in range(depth):
-    #        for parent_node in DecisionTreePruned.get_level_in_list(fitted_tree, depth-i-1):
-    #            if parent_node.left_child is not None:
-    #                DecisionTreePruned.collapse_node_non_naively(parent_node, X_test, y_test)
 
     @staticmethod
     def get_first_subtree(fitted_tree, thresh=None):
@@ -262,8 +242,19 @@ class DecisionTreePruned:
             return subtrees[index]
 
     @staticmethod
-    def get_optimal_subtree_via_k_fold_cv(fitted_tree, X_learn, y_learn, k):
-        #  Here <<X_learn>> and <<y_learn>> were used to get <<fitted_tree>>
+    def get_optimal_subtree_via_k_fold_cv(X_learn, y_learn, k=5, fitted_tree=None):
+        try:
+            feature_names = X_learn.columns.values
+        except AttributeError:
+            feature_names = None
+
+        if fitted_tree is None:   # Here <<X_learn>> and <<y_learn>> are used to get <<fitted_tree>> if it is passed
+            fitted_tree = DecisionTreePruned()
+            fitted_tree.fit(X_learn, y_learn)
+        assert(len(y_learn) == len(X_learn)), "Argument <<X_learn>> and <<y_learn>> must have the same number " \
+                                              "of observations."
+        X_learn = coerce_to_ndarray(X_learn)
+        y_learn = coerce_to_ndarray(y_learn)
 
         kf = KFold(k)
         tree_max = fitted_tree  # complete maximal tree
@@ -296,8 +287,11 @@ class DecisionTreePruned:
             alpha_cv_errors.append(err_alpha / k)
 
         alpha_cv_errors = np.array(alpha_cv_errors)
-        optimal_index = int(np.where(alpha_cv_errors == alpha_cv_errors.min())[0])
+        optimal_index = int(np.where(alpha_cv_errors == alpha_cv_errors.min())[0])  # if multiple trees achieve the
+        # same alpha, am I taking the smalles one, what is with 1.5 standard deviations ???
         optimal_subtree = potential_subtrees[optimal_index]
+        optimal_subtree.feature_names = feature_names
+
         return optimal_subtree
 
     # Algorithm Implementation and Fitting Functions
@@ -370,33 +364,17 @@ class DecisionTreePruned:
 
         if self._split_var is not None and max_depth >= 1:
             index = X[:, self._split_var] <= self._split_value
-            #x_left, y_left = X[index], y[index]
-            #x_right, y_right = X[~index], y[~index]
-            #self._left_child.fit(x_left, y_left, min_leaf, max_depth-1)
-            #self._right_child.fit(x_right, y_right, min_leaf, max_depth-1)
 
             self._left_child = DecisionTreePruned(parent=self)
             self._right_child = DecisionTreePruned(parent=self)
+            self._left_child.feature_names = self.feature_names
+            self._right_child.feature_names = self.feature_names
 
             self._left_child.fit(X[index], y[index], min_leaf, max_depth-1)
             self._right_child.fit(X[~index], y[~index], min_leaf, max_depth-1)
 
         self.update_branch_loss()
         return self
-
-    #  Cross Validation Functions and Co. FUCK IM ANGRY
-    ###################################################################################################################
-
-    #def cost_complexity(self, X_train, y_train, alpha):
-    #    num_leafs = len(self.get_leafs_in_list())
-    #    return self.score(X_train, y_train) + alpha * num_leafs
-
-    #def score(self, X, y, sample_weight=None):
-    #    y_pred = self.predict(X)
-    #    return np.mean((y - y_pred)**2)
-
-    #  Prediction Functions
-    ###################################################################################################################
 
     def predict_row(self, xi):
         if self.is_leaf:
@@ -462,7 +440,7 @@ def compute_loss(y, loss_func=None) -> float:
     if loss is None:
         raise ValueError("Loss function cannot be computed on the outcome vector.")
     else:
-        return loss
+        return float(loss)
 
 
 def test_monotonicity_list(lst: list, strictly=True) -> bool:
@@ -470,3 +448,19 @@ def test_monotonicity_list(lst: list, strictly=True) -> bool:
         return all(x < y for x, y in zip(lst, lst[1:]))
     else:
         return all(x <= y for x, y in zip(lst, lst[1:]))
+
+
+def plot(tree: DecisionTreePruned, filename=None):
+    dot = Graph(name="regression_tree", filename=filename, format='svg')
+    dot.node(str(id(tree)), tree.splitting_info_to_string() + "\nestimate:" + str(round(float(tree.value), 3)))
+    for i in range(tree.depth):
+        nodes = DecisionTreePruned.get_level_in_list(tree, i + 1)
+        for node in nodes:
+            if node.left_child is None:
+                dot.node(str(id(node)), "This node is not split" + "\nestimate:" + str(round(float(node.value), 3)))
+                dot.edge(str(id(node.parent)), str(id(node)))
+            else:
+                dot.node(str(id(node)), node.splitting_info_to_string()
+                         + "\nestimate:" + str(round(float(node.value), 3)))
+                dot.edge(str(id(node.parent)), str(id(node)))
+    dot.render(view=True)

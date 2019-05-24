@@ -2,9 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="46b43225-fdcd-4277-9a21-19aadb0d24bf" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DecisionTreePruned.py" beforeDir="false" afterPath="$PROJECT_DIR$/DecisionTreePruned.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/simulate_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/simulate_data.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -31,8 +30,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/DecisionTreePruned.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="525">
-              <caret line="373" column="4" selection-start-line="373" selection-start-column="4" selection-end-line="373" selection-end-column="4" />
+            <state relative-caret-position="431">
+              <caret line="463" column="76" lean-forward="true" selection-start-line="463" selection-start-column="76" selection-end-line="463" selection-end-column="76" />
               <folding>
                 <element signature="e#0#19#0" expanded="true" />
               </folding>
@@ -175,16 +174,15 @@
       <workItem from="1558081147253" duration="31900000" />
       <workItem from="1558252245367" duration="1942000" />
       <workItem from="1558426191486" duration="8316000" />
-      <workItem from="1558687679460" duration="7977000" />
+      <workItem from="1558687679460" duration="19792000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="147209000" />
+    <option name="totallyTimeSpent" value="159024000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="27" width="1366" height="741" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" weight="0.04621212" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -208,7 +206,7 @@
       <window_info anchor="right" id="R Graphics" order="4" sideWeight="0.49917626" weight="0.32954547" />
       <window_info anchor="right" id="R Packages" order="5" />
       <window_info anchor="right" x="0" y="0" width="120" height="541" id="Documentation" order="6" sideWeight="0.50082916" side_tool="true" visible="true" weight="0.02276176" />
-      <window_info active="true" anchor="right" x="0" y="64" width="1366" height="704" id="Python Console" maximized="true" order="7" sideWeight="0.49209931" type="WINDOWED" visible="true" weight="0.24675325" />
+      <window_info anchor="right" x="0" y="64" width="1366" height="704" id="Python Console" maximized="true" order="7" sideWeight="0.49209931" type="WINDOWED" weight="0.24675325" />
       <window_info anchor="right" id="Database" order="8" sideWeight="0.4991708" visible="true" weight="0.02276176" />
     </layout>
   </component>
@@ -240,8 +238,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/DecisionTreePruned.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="525">
-          <caret line="373" column="4" selection-start-line="373" selection-start-column="4" selection-end-line="373" selection-end-column="4" />
+        <state relative-caret-position="431">
+          <caret line="463" column="76" lean-forward="true" selection-start-line="463" selection-start-column="76" selection-end-line="463" selection-end-column="76" />
           <folding>
             <element signature="e#0#19#0" expanded="true" />
           </folding>

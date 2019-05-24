@@ -1,0 +1,37 @@
+List of functions relevant for pruning process:
+
+update_branch_loss(self)
+
+output_partition_estimates(self)
+
+collapse_node_if(parent_node) ### actually needed??? 
+
+collapse_node_non_naively(parent_node) ### actually needed??? 
+
+validate(tree, X_test, y_test, metric=None)
+
+get_first_subtree(fitted_tree, thresh=None)
+
+get_pruned_tree_and_alpha_sequence(fitted_tree)
+-> Check if alpha sequence is increasing
+
+get_subtree_corresponding_to_arbitrary_alpha(tree, alpha)
+
+############### MASTER FUNCTION ##########################
+
+get_optimal_subtree_via_k_fold_cv(fitted_tree, X_learn, y_learn, k)
+
+
+################# COST COMPLEXITY FUNCTIONS #####################3
+
+cost_complexity(self, X_train, y_train, alpha)
+
+score(self, X, y, sample_weight=None)
+
+pre_order_traverse_tree(root, func)
+
+g_value(node)
+
+g(branch)
+
+
