@@ -12,6 +12,10 @@ This part of the project is written in python code only. We will use PyCharm loc
 ## DecisionTreePruned.py
 Right now this is the most important file. It contains the class DecisionTreePruned which is an estimator that takes in training data and builds a regression tree from it. It can also predict and validate on new data and testing data, respectively. However, right now the only part of the algorithm which guards from overfitting is setting the hyper parameters min_leaf (minimum number of observations in each leaf) and max_depth (maximum number of depht of the tree). Unfortunately it can easily be shown that using these hyper parameters alone to avoid overfitting will lead to inefficient estimators. This is why I am currently implementing the pruning process as described by Breiman, Tibsharini, Hastie, etc. 
 
+#### Important Functions
+- get_optimal_subtree_via_k_fold_cv(X_learn, y_learn, k=5, fitted_tree=None) [computes the optimal tree via k-fold cross-validation using a learning dataset]
+- plot(tree) [plots tree object in a hierachical (upside-down) tree-like structure]
+
 ### TODO 
 
 1. [Optimize Code] 
