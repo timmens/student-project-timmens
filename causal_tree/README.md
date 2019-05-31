@@ -12,10 +12,16 @@ This part of the project is written in python code only. We will use PyCharm loc
 ## DecisionTree.py [DONE]
 This class finalizes step one; It contains all the relevant functions to fit a regression tree on given data using an arbitrary loss function for split point evaluation. Furthermore, in contrast to the decision tree implemented in scikit-learn, this class also implements the important pruning algorithm guarding against overfitting. See [Hastie et.al. 2009](https://web.stanford.edu/~hastie/ElemStatLearn/) for the standard decision tree algorithm; see [PennState Stat508 Course](https://newonlinecourses.science.psu.edu/stat508/lesson/11/11.8) for an excellent introduction to minimal-cost complexity pruning.
 
-#### Important Functions
-- ```python
-get_optimal_subtree_via_k_fold_cv(X_learn, y_learn, k=5, fitted_tree=None)``` [computes the optimal tree via k-fold cross-validation using a learning dataset]
-- ```python plot(tree)``` [plots tree object in a hierachical (upside-down) tree-like structure]
+#### Important Functions (introduced by an example)
+  ```python
+  X, y = get_data_somewhere() # X and y are a numpy ndarray or pandas DataFrame / Series
+  tree = DecisionTree()
+  tree.fit(X, y) # (pure over-)fits tree using given data; use code below 
+  
+  optimal_tree = get_optimal_subtree_via_k_fold_cv(X, y, k=5, fitted_tree=None)
+  print(optimal_tree) # displays some relevant information on the tree
+  plot(optimal_tree) # plots tree in a hierachical (upside-down) tree like structure 
+  ``` 
 
 ## CausalTree.py [In the making..]
 As described above, this class will build on the class DecisionTree.py; however, at the relevant places changes will be made as illustrated in Athey (2015). 
