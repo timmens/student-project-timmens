@@ -4,13 +4,13 @@
 
 In this project we try to understand the method (causal trees) presented in Athey (2015), which estimates heterogenous treatment effects. The project will be split into various parts:
 
-1. Implement a classical regression tree algorithm (since their method is based on regression trees)
-2. Using the implemented algorithm from above and guidelines from the paper we try to implement the causal tree
-3. Produce small simulation study which will compare the following methods in a heterogenous treatment setting
+1. Implement a classical regression tree algorithm (since their method is based on regression trees) [Done] 
+2. Using the implemented algorithm from above and guidelines from the paper we try to implement the causal tree [In the making...]
+3. Produce small simulation study which will compare the following methods in a heterogenous treatment setting [to be done]
 * Classical treatment effect estimator which does **not** account for heterogeneity 
 * Classical treatment effect estimator which does account for heterogeneity
 * Causal Trees
-4. [Outlook how to get from Causal Trees to Causal Forests] 
+4. [Outlook on how to get from Causal Trees to Causal Forests] 
 5. [Proofs of Theorems and Lemmata] 
 
 

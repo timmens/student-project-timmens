@@ -1,14 +1,11 @@
 import pandas as pd
 import numpy as np
-# from IPython.display import Image, display
 from graphviz import Graph
 from copy import deepcopy
 from sklearn.model_selection import KFold
 
 
-class DecisionTreePruned:
-    # 1. make sure that I do not change anything, because numpy uses copy by reference and not copy by value
-    # maybe should use deepcopy more often
+class CausalTree:
 
     def __init__(self, parent=None):
         self._parent = parent
@@ -75,7 +72,7 @@ class DecisionTreePruned:
 
     @property
     def depth(self):
-        return DecisionTreePruned.detect_tree_depth(self)
+        return CausalTree.detect_tree_depth(self)
 
     @property
     def is_leaf(self):
@@ -97,7 +94,7 @@ class DecisionTreePruned:
     def number_of_leafs(self):
         # Because this is a property and not an attribute it gets updated automatically when it is called
         # however this might be a little inefficient, we will see
-        return DecisionTreePruned.get_number_of_leafs(self)
+        return CausalTree.get_number_of_leafs(self)
 
     @property
     def value(self):
@@ -116,12 +113,12 @@ class DecisionTreePruned:
     ###################################################################################################################
 
     def update_branch_loss(self):
-        leaf_list = DecisionTreePruned.get_leafs_in_list(self)
+        leaf_list = CausalTree.get_leafs_in_list(self)
         loss_array = np.array([leaf.node_loss for leaf in leaf_list])
         self._branch_loss = np.sum(loss_array)
 
     def output_partition_estimates(self):
-        leaf_list = DecisionTreePruned.get_leafs_in_list(self)
+        leaf_list = CausalTree.get_leafs_in_list(self)
         for i, leaf in enumerate(leaf_list):
             print('Leaf {:d}; Estimate: {:3.03f}'.format(i, leaf.value))
 
@@ -143,13 +140,13 @@ class DecisionTreePruned:
         if tree.left_child is None:
             leaf_list.append(tree)
         else:
-            leaf_list.extend(DecisionTreePruned.get_leafs_in_list(tree.left_child))
-            leaf_list.extend(DecisionTreePruned.get_leafs_in_list(tree.right_child))
+            leaf_list.extend(CausalTree.get_leafs_in_list(tree.left_child))
+            leaf_list.extend(CausalTree.get_leafs_in_list(tree.right_child))
         return leaf_list
 
     @staticmethod
     def get_number_of_leafs(tree):
-        return len(DecisionTreePruned.get_leafs_in_list(tree))
+        return len(CausalTree.get_leafs_in_list(tree))
 
     @staticmethod
     def get_level_in_list(tree, level):
@@ -159,16 +156,16 @@ class DecisionTreePruned:
             level_list.append(tree)
         else:
             if tree.left_child is not None:
-                level_list.extend(DecisionTreePruned.get_level_in_list(tree.left_child, level - 1))
-                level_list.extend(DecisionTreePruned.get_level_in_list(tree.right_child, level - 1))
+                level_list.extend(CausalTree.get_level_in_list(tree.left_child, level - 1))
+                level_list.extend(CausalTree.get_level_in_list(tree.right_child, level - 1))
         return level_list
 
     @staticmethod
     def detect_tree_depth(tree):
         depth_left, depth_right = 0, 0
         if tree.left_child is not None:
-            depth_left += 1 + DecisionTreePruned.detect_tree_depth(tree.left_child)
-            depth_right += 1 + DecisionTreePruned.detect_tree_depth(tree.right_child)
+            depth_left += 1 + CausalTree.detect_tree_depth(tree.left_child)
+            depth_right += 1 + CausalTree.detect_tree_depth(tree.right_child)
         return max(depth_left, depth_right)
 
     @staticmethod
@@ -189,7 +186,7 @@ class DecisionTreePruned:
         if depth < 1:
             return subtree
         for i in range(depth):
-            for parent_node in DecisionTreePruned.get_level_in_list(subtree, depth-i-1):
+            for parent_node in CausalTree.get_level_in_list(subtree, depth-i-1):
                 if parent_node.left_child is not None:
                     if parent_node.node_loss <= parent_node.left_child.node_loss + \
                             parent_node.right_child.node_loss + thresh:
@@ -197,20 +194,20 @@ class DecisionTreePruned:
         return subtree
 
     @staticmethod
-    def get_pruned_tree_and_alpha_sequence(fitted_tree):
+    def get_pruned_tree_and_alpha_sequence(fitted_tree, thresh):
         #  let tree be the node in question, i.e. tree = t
         #  then R(t)   = tree.node_loss
         #       R(T_t) = tree.branch_loss (gets updated automatically when called)
         #       |T_t|  = tree.number_of_leafs (gets updated automatically when called)
         #  2. Compute the first Tree, i.e. T_1, set alpha_1 = 0
         #  3. Construct sequence of trees and alphas.
-        assert isinstance(fitted_tree, DecisionTreePruned), 'This method only works on Decision Trees'
+        assert isinstance(fitted_tree, CausalTree), 'This method only works on Decision Trees'
         if not fitted_tree.is_fitted:
             raise ValueError('This method only works on fitted trees')  # here we throw an error instead of using
             # assert since this error can be solved by fitting the tree and then calling the function again
 
         alphas = [0]
-        subtrees = [DecisionTreePruned.get_first_subtree(fitted_tree)]  # get_first_subtree() does deepcopy
+        subtrees = [CausalTree.get_first_subtree(fitted_tree, thresh)]  # get_first_subtree() does deepcopy
 
         index = 0
         while subtrees[index].left_child is not None:
@@ -230,8 +227,8 @@ class DecisionTreePruned:
         return {'alphas': alphas, 'subtrees': subtrees}  # i think i want: return alphas, subtrees
 
     @staticmethod
-    def get_subtree_corresponding_to_arbitrary_alpha(tree, alpha):
-        sequences = DecisionTreePruned.get_pruned_tree_and_alpha_sequence(tree)
+    def get_subtree_corresponding_to_arbitrary_alpha(tree, alpha, thresh):
+        sequences = CausalTree.get_pruned_tree_and_alpha_sequence(tree, thresh)
         alphas = sequences['alphas']
         subtrees = sequences['subtrees']
         alphas = np.array(alphas)
@@ -242,14 +239,14 @@ class DecisionTreePruned:
             return subtrees[index]
 
     @staticmethod
-    def get_optimal_subtree_via_k_fold_cv(X_learn, y_learn, k=5, fitted_tree=None):
+    def get_optimal_subtree_via_k_fold_cv(X_learn, y_learn, k=5, thresh=0, fitted_tree=None):
         try:
             feature_names = X_learn.columns.values
         except AttributeError:
             feature_names = None
 
         if fitted_tree is None:   # Here <<X_learn>> and <<y_learn>> are used to get <<fitted_tree>> if it is passed
-            fitted_tree = DecisionTreePruned()
+            fitted_tree = CausalTree()
             fitted_tree.fit(X_learn, y_learn)
         assert(len(y_learn) == len(X_learn)), "Argument <<X_learn>> and <<y_learn>> must have the same number " \
                                               "of observations."
@@ -258,21 +255,21 @@ class DecisionTreePruned:
 
         kf = KFold(k)
         tree_max = fitted_tree  # complete maximal tree
-        tree_max_sequences = DecisionTreePruned.get_pruned_tree_and_alpha_sequence(tree_max)
+        tree_max_sequences = CausalTree.get_pruned_tree_and_alpha_sequence(tree_max, thresh)
         tree_k_max_list = []  # list of maximal trees in each cross validation sample
         tree_k_subtree_dict = []
         test_X = []
         test_y = []
 
         for train_index, test_index in kf.split(X_learn, y_learn):
-            tmp_tree = DecisionTreePruned()
+            tmp_tree = CausalTree()
             tmp_tree.fit(X_learn[train_index], y_learn[train_index])
             tree_k_max_list.append(tmp_tree)
             test_X.append(X_learn[test_index])
             test_y.append(y_learn[test_index])
 
         for tree in tree_k_max_list:
-            tree_k_subtree_dict.append(DecisionTreePruned.get_pruned_tree_and_alpha_sequence(tree))
+            tree_k_subtree_dict.append(CausalTree.get_pruned_tree_and_alpha_sequence(tree, thresh))
 
         alphas = tree_max_sequences['alphas']
         potential_subtrees = tree_max_sequences['subtrees']
@@ -281,8 +278,8 @@ class DecisionTreePruned:
         for alpha in alphas:
             err_alpha = 0
             for k, cv_tree in enumerate(tree_k_max_list):
-                cv_alpha_subtree = DecisionTreePruned.get_subtree_corresponding_to_arbitrary_alpha(cv_tree, alpha)
-                err_alpha += DecisionTreePruned.validate(cv_alpha_subtree, test_X[k], test_y[k])
+                cv_alpha_subtree = CausalTree.get_subtree_corresponding_to_arbitrary_alpha(cv_tree, alpha, thresh)
+                err_alpha += CausalTree.validate(cv_alpha_subtree, test_X[k], test_y[k])
 
             alpha_cv_errors.append(err_alpha / k)
 
@@ -365,8 +362,8 @@ class DecisionTreePruned:
         if self._split_var is not None and max_depth >= 1:
             index = X[:, self._split_var] <= self._split_value
 
-            self._left_child = DecisionTreePruned(parent=self)
-            self._right_child = DecisionTreePruned(parent=self)
+            self._left_child = CausalTree(parent=self)
+            self._right_child = CausalTree(parent=self)
             self._left_child.feature_names = self.feature_names
             self._right_child.feature_names = self.feature_names
 
@@ -393,7 +390,7 @@ class DecisionTreePruned:
 #  General Function (Some of which might be static methods in a strict sense)
 #######################################################################################################################
 
-def pre_order_traverse_tree(root: DecisionTreePruned, func=None) -> list:
+def pre_order_traverse_tree(root: CausalTree, func=None) -> list:
     values = []
     if func is None:
         if root is not None:
@@ -408,11 +405,11 @@ def pre_order_traverse_tree(root: DecisionTreePruned, func=None) -> list:
     return values
 
 
-def g_value(node: DecisionTreePruned) -> float:
+def g_value(node: CausalTree) -> float:
     return float('Inf') if node.is_leaf else (node.node_loss - node.branch_loss) / (node.number_of_leafs - 1)
 
 
-def g(branch: DecisionTreePruned) -> tuple:
+def g(branch: CausalTree) -> tuple:
     nodes = pre_order_traverse_tree(branch)
     values = np.array(pre_order_traverse_tree(branch, g_value))
     minimum = values.min()
@@ -450,11 +447,13 @@ def test_monotonicity_list(lst: list, strictly=True) -> bool:
         return all(x <= y for x, y in zip(lst, lst[1:]))
 
 
-def plot(tree: DecisionTreePruned, filename=None):
+def plot(tree: CausalTree, filename=None, save=False):
+    if filename is None:
+        filename = "regression_tree.svg"
     dot = Graph(name="regression_tree", filename=filename, format='svg')
     dot.node(str(id(tree)), tree.splitting_info_to_string() + "\nestimate:" + str(round(float(tree.value), 3)))
     for i in range(tree.depth):
-        nodes = DecisionTreePruned.get_level_in_list(tree, i + 1)
+        nodes = CausalTree.get_level_in_list(tree, i + 1)
         for node in nodes:
             if node.left_child is None:
                 dot.node(str(id(node)), "This node is not split" + "\nestimate:" + str(round(float(node.value), 3)))
@@ -464,3 +463,5 @@ def plot(tree: DecisionTreePruned, filename=None):
                          + "\nestimate:" + str(round(float(node.value), 3)))
                 dot.edge(str(id(node.parent)), str(id(node)))
     dot.render(view=True)
+    if save:
+        dot.save()
