@@ -15,4 +15,6 @@ The simulation exercise can be divided into the following steps.
 4. Data from a randomized experiment.   
    * compare all of the previously discussed methods
 
-   
+## To Do
+1. Think about useful illustrations of the shortcomings of conventional estimation techniques in high dimensions
+2. Nicely write-up existing results.
