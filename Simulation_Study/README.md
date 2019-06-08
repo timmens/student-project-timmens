@@ -14,6 +14,7 @@ The simulation exercise can be divided into the following steps.
    * comparison of non-parametric regression and causal trees/forests
 4. Data from a randomized experiment.   
    * compare all of the previously discussed methods
+   * visualize heterogeneity
 
 ## To Do
 1. Think about useful illustrations of the shortcomings of conventional estimation techniques in high dimensions
