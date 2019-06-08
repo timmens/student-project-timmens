@@ -1,1 +1,2 @@
-
+## Simulation Study + (Data example)
+This simulation study will use different data generating processes to illustrate the importance of heterogeneous treatment effects. I'll start out with settings that can be tackled with off-the-shelf estimation techniques such as OLS and/or propensity score matching and will gradually increase the level of sophistication inherent to the settings to work out the benefits of using causal trees/forests. 
