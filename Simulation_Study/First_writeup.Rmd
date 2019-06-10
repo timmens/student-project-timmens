@@ -1,0 +1,154 @@
+---
+title: "Simulation Study"
+output: 
+  html_document:
+    keep_md: true
+bibliography: bibliography.bib
+number_sections: yes
+header-includes:
+  - \usepackage{amsmath}
+  - \usepackage{setspace}
+  - \usepackage{hyperref}
+  - \onehalfspacing
+  - \setlength{\abovedisplayskip}{-10pt}
+  - \setlength{\belowdisplayskip}{0pt}
+  - \setlength{\abovedisplayshortskip}{-10pt}
+  - \setlength{\belowdisplayshortskip}{0pt}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+\newcommand{\E}{{\rm I\kern-.3em E}}
+\newcommand{\Var}{\mathrm{Var}}
+\newcommand{\Cov}{\mathrm{Cov}}
+\newcommand{\x}{\bm{x}}
+\newcommand{\X}{\textbf{X}}
+\newcommand{\Y}{\textbf{Y}}
+\newcommand{\be}{\bm{\beta}}
+\newcommand{\Betah}{\bm{\betah}}
+\newcommand{\tx}{\widetilde{X}}
+\newcommand{\tY}{\widetilde{Y}}
+\newcommand{\Covh}{\widehat{\Cov}}
+\newcommand{\Varh}{\widehat{\Var}}
+\newcommand{\betah}{\widehat{\beta}}
+\newcommand{\Eh}{\widehat{\E}}
+\newcommand{\YO}{Y(0)}
+\newcommand{\YI}{Y(1)}
+\newcommand{\indep}{\perp \!\!\! \perp}
+
+\section{Setting + Assumptions}
+Suppose we have random sample (i.i.d.) of the reference population, each containing a feature vector $X_i$, a treatment indicator $D_i$ and an outcome $Y_i$. In short: $\left\{(Y_i,X_i,D_i)\right\}_{i=1}^{n}$.\newline
+Generally, we'll either assume unconfoundedness (ignorability) or purely random treatment assignment in our DGPs. More formally, random treatment assignment amounts to 
+$$
+\begin{equation}
+(\YI,\YO)\enspace\indep\enspace D.\label{eq:rt}
+\end{equation}
+$$
+In situations usually analyzed within the social sciences, this assumption turns out to be too restrictive (ref.). Therefore, as we've seen throughout the course, many methods were developed under the assumption of unconfoundedness:
+$$
+\begin{equation}
+(\YI,\YO)\enspace\indep\enspace D\enspace \lvert\enspace X.\label{eq:uf}
+\end{equation}
+$$
+This is also used by [@wager2018estimation] to develop the theory of causal trees/forests.\newline
+Within the simulation study we'll also try to stress the consequences for estimation when switching from (\ref{eq:rt}) to (\ref{eq:uf}). 
+\subsection{Heterogeneous Treatment Effects}
+To develop an intuition for the importance of heterogeneity in treatment effects, we define the Average Treatment Effect (ATE) and the Conditional Average Treatment Effect (CATE) as follows.
+$$
+\begin{align}
+\delta&\equiv \E(\YI-\YO)\label{eq:ate}\\[5pt]
+\delta(x)&\equiv\E(\YI-\YO\vert X=x)\label{eq:cate}
+\end{align}
+$$
+These definitions are conceptually different: While the CATE is a real-valued function mapping a realization of the random variable $X$ to a real number, the ATE is a real number. Thus, by definition, the CATE allows to have \textit{distinct} treatment effects for different realizations of $X$. By the law of iterated expectation we have the following relationship:\vspace{1em}
+$$
+\begin{equation*}
+\E\left(\delta(X)\right)=\delta
+\end{equation*}
+$$
+Thus, the ATE is a summary statistic of the CATE. Example for illustration + ref.  
+
+\section{First Model}
+For the whole first part of the simulations, I'll stick to models that are linear in parameters when it comes to generating the potential outcomes. More specifically,
+$$
+\begin{align}
+Y(0)&=\gamma_0 + \gamma_1\cdot g(X)+ \gamma_2\cdot h(X) +\varepsilon \\
+Y(1)&=\phi_0 + \phi_1\cdot f(X)+ \phi_2\cdot c(X)+\varepsilon,
+\end{align}
+$$
+where
+\begin{itemize}
+\item $\varepsilon \stackrel{\text{i.i.d}}{\sim} \mathcal{N}(0,1),\quad X \stackrel{\text{i.i.d}}{\sim} U[0,1]$
+\item $g(\cdot),h(\cdot),f(\cdot),\enspace \text{and}\enspace c(\cdot)$ are real-valued functions
+\item $\phi_j, \gamma_j \in \mathbb{R}$, $j=1,2,3$
+\end{itemize}
+In this model, ATE (\ref{eq:ate}) and CATE (\ref{eq:cate}) become
+$$
+\begin{align*}
+\delta&=\phi_0 - \gamma_0 + \phi_1 \E(f(X))-\gamma_1 \E(g(X))+\phi_2\E(c(X))-\gamma_2\E(h(X))\\[5pt]
+\delta(x)&=\phi_0 - \gamma_0 + \phi_1 f(x)-\gamma_1 g(x)+\phi_2 c(x)-\gamma_2 h(x).
+\end{align*}
+$$
+The workhorse function to generate the simulations from the first part looks as follows.
+
+```{r, eval=FALSE}
+sim <- function(n, het_linear = FALSE, random_assignment = TRUE,
+                non_linearY = FALSE, non_linearD = FALSE,
+                gamma0=1, gamma1=3, gamma2=0, gamma3=1,
+                phi0=5, phi1=3, phi1p=5, phi2=0, phi3=5){
+  x <- runif(n)
+  eps <- rnorm(n)
+  #
+  if(random_assignment){D <- rbinom(n,size=1,prob=0.5)}
+  else{
+    D <- rep(0,n)
+    if(non_linearD){
+    c_1<- 0.1; c_2 <- 0.89
+    prt <- function(x){c_1+0.01*x+c_2*sin(pi*x)}
+    }
+    else{prt <- function(x){x}}
+    for(j in seq_along(D)){D[j] <- rbinom(1,size=1,prob=prt(x[j]))}
+  }
+  if(non_linearY){
+    nl <- function(z,const,t=1){const+3*z+20*sin(pi*z*t)}
+    y1 <- nl(z=x,const=phi0,t=phi3) + eps
+    y0 <- nl(z=x,const=gamma0,t=gamma3) + eps
+    }
+  else{
+    if(het_linear){y1 <- phi0 + phi1p*x + eps}
+    else{y1 <- phi0 + phi1*x + eps}
+    y0 <- gamma0 + gamma1*x + eps
+  }
+  res <- tibble(Y0=y0[order(x)], Y1=y1[order(x)], X=sort(x),
+                D=D[order(x)],Y_obs=rep(0,n),IntXD=x[order(x)]*D[order(x)])
+  res$Y_obs[res$D==1] <- res$Y1[res$D==1]
+  res$Y_obs[res$D==0] <- res$Y0[res$D==0]
+  return(res)
+}
+```
+
+\subsection{Constant treatment effects (no heterogeneity) + linearity} 
+For the first simulation we'll study a straightforward setup to illustrate where CATE and ATE coincide. We'll use the following specification.
+\begin{itemize}
+\item $f:\mathbb{R} \longrightarrow \mathbb{R},\quad x \mapsto x$ and $f=g=c=h$
+\item $\phi_1 = \gamma_1$ and $\phi_2 = \gamma_2 = 0$
+\item $\phi_0=5$, $\gamma_0 = 1$
+\end{itemize}
+Thus we obtain 
+$$
+\begin{align*}
+\delta&=\phi_0 - \gamma_0+\E\left[(\phi_1-\gamma_1)\cdot X \right]\\
+&=\phi_0 - \gamma_0\\[10pt]
+\delta(x)&=\E(\phi_0 - \gamma_0\vert X=x)\\
+&=\phi_0 - \gamma_0\\
+&= 4
+\end{align*}
+$$
+
+## Packages
+```{r, eval=FALSE}
+library(tidyverse)
+library(np)
+```
+# References 
