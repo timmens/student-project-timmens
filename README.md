@@ -1,4 +1,4 @@
-# Student Project - Tim Mensinger 
+# Student Project - Tim Mensinger and Florian Schoner
 
 ## Aim
 
