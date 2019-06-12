@@ -21,4 +21,6 @@ The simulation exercise can be divided into the following steps.
 1. Think about useful illustrations of the shortcomings of conventional estimation techniques in high dimensions
 2. Nicely write-up existing results.
 3. Frame the DGP in terms of structural equations and build the corresponding causal graph.
+4. Check how bibtex-citations can be included.
+5. Write math up consistently
 
