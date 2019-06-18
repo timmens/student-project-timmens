@@ -21,6 +21,7 @@ class CausalTree:
         self._feature_names = None
         self._num_features = None
         self._y = None
+        self._treatment_status
 
     def __str__(self):
         if self._is_fitted is False:
@@ -40,6 +41,10 @@ class CausalTree:
     @property
     def y(self):
         return self._y
+
+    @property
+    def treatment_status(self):
+        return self._treatment_status
 
     @property
     def parent(self):
@@ -133,6 +138,25 @@ class CausalTree:
 
     # Static Methods (Some of which should probably not be static methods)
     ###################################################################################################################
+    @staticmethod
+    def compute_estimated_treatment_effect_in_leaf(y, treatment_status):
+        assert len(y) == len(treatment_status)
+        assert np.array_equal(np.unique(treatment_status), np.array([0, 1]))
+        if treatment_status.dtype != 'bool':
+            treatment_status = np.array(treatment_status, dtype='bool')
+        y_treat = y[treatment_status]
+        y_untreat = y[~treatment_status]
+        return y_treat.mean() - y_untreat.mean()
+
+    @staticmethod
+    def transform_outcome(y, treatment_status, p=None):
+        if treatment_status.dtype != 'int':
+            treatment_status = np.array(treatment_status, dtype='int')
+        if p is None:
+            y_star = 2 * y * treatment_status - 2 * y * (1 - treatment_status)
+        else:
+            pass
+        return y_star
 
     @staticmethod
     def get_leafs_in_list(tree):
@@ -325,14 +349,21 @@ class CausalTree:
 
         return split_index, split_value, loss
 
-    def fit(self, X, y, min_leaf=5, max_depth=10):
+    def fit(self, X, y, treatment_status=None, min_leaf=5):  # , max_depth=10):
         # Check Input Values
         if self.is_root:
             assert min_leaf >= 1, "Parameter <<min_leaf>> has to be bigger than one."
-            assert max_depth >= 1, "Parameter <<max_depth>> has to be bigger or equal than one."
+            # assert max_depth >= 1, "Parameter <<max_depth>> has to be bigger or equal than one."
             assert len(X) == len(y), "Data <<X>> and <<y>> must have the same number of observations."
             assert len(y) >= 2 * min_leaf, "Data has not enough observations for a single split to occur " \
                                            "given value of <<min_leaf>>."
+            if treatment_status is None:
+                #  In case treatment_status is not given it must be that X is a pandas DataFrame, else we throw an error
+                assert 'treatment_status' in X.columns
+                treatment_status = X[['treatment_status']]
+                X = X.drop(['treatment_status'], axis=1)
+            else:
+                assert len(y) == len(treatment_status)
 
         # Do Stuff for Root
         if self.is_root:
@@ -342,6 +373,7 @@ class CausalTree:
                 pass
             X = coerce_to_ndarray(X)  # coerce to ndarray (since all following functions expect numpy arrays)
             y = coerce_to_ndarray(y)
+            treatment_status = coerce_to_ndarray(treatment_status)
             self._num_features = X.shape[1]
 
         # Set Parameters
@@ -359,7 +391,7 @@ class CausalTree:
         else:
             self._branch_loss = tmp_loss
 
-        if self._split_var is not None and max_depth >= 1:
+        if self._split_var is not None:  # and max_depth >= 1:
             index = X[:, self._split_var] <= self._split_value
 
             self._left_child = CausalTree(parent=self)
@@ -367,8 +399,8 @@ class CausalTree:
             self._left_child.feature_names = self.feature_names
             self._right_child.feature_names = self.feature_names
 
-            self._left_child.fit(X[index], y[index], min_leaf, max_depth-1)
-            self._right_child.fit(X[~index], y[~index], min_leaf, max_depth-1)
+            self._left_child.fit(X[index], y[index], min_leaf)  # , max_depth-1)
+            self._right_child.fit(X[~index], y[~index], min_leaf)  # , max_depth-1)
 
         self.update_branch_loss()
         return self
@@ -465,3 +497,7 @@ def plot(tree: CausalTree, filename=None, save=False):
     dot.render(view=True)
     if save:
         dot.save()
+
+
+#  Notes: 1) Removed max_depth criterion since we will be growing large trees anyways and therefore the only criterion
+#  necessary is the minimum_leaf_size criterion

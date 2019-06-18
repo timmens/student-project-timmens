@@ -27,11 +27,13 @@ This class finalizes step one; It contains all the relevant functions to fit a r
 As described above, this class will build on the class DecisionTree.py; however, at the relevant places changes will be made as illustrated in Athey (2015). 
 
 
-### TODO 
-1. [Optimize Code] 
+### TODO (CausalTree) 
+1. Implement treatment effect estimation function for each leaf [DONE]
+2. Construct function to transform the outcome accordingly (needed for new metric) [DONE]
+3. Write code for new metric, here we need to adjust a lot of previous code [In the making] 
 
 
 ### TOCHECK
 1. Check if I get any problems by not using deepcopy or np.copy 
-2. Check if all loss functions that are being used are defined equally; in particular len(y) * var(y) vs. var(y) 
-
+2. Check if all loss functions that are being used are defined equally; in particular len(y) * var(y) vs. var(y)
+3. What about l1 loss? 
