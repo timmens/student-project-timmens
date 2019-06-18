@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="46b43225-fdcd-4277-9a21-19aadb0d24bf" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CausalTree.py" beforeDir="false" afterPath="$PROJECT_DIR$/CausalTree.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-    </list>
+    <list default="true" id="46b43225-fdcd-4277-9a21-19aadb0d24bf" name="Default Changelist" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -43,8 +39,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/CausalTree.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="525">
-              <caret line="259" column="21" selection-start-line="259" selection-start-column="21" selection-end-line="259" selection-end-column="21" />
+            <state relative-caret-position="446">
+              <caret line="502" selection-start-line="502" selection-end-line="502" />
               <folding>
                 <element signature="e#0#19#0" expanded="true" />
               </folding>
@@ -185,12 +181,12 @@
       <workItem from="1559309969805" duration="2125000" />
       <workItem from="1559833007203" duration="633000" />
       <workItem from="1560239009418" duration="1307000" />
-      <workItem from="1560846259697" duration="2928000" />
+      <workItem from="1560846259697" duration="4119000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="170312000" />
+    <option name="totallyTimeSpent" value="171503000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="27" width="1366" height="741" extended-state="6" />
@@ -259,8 +255,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/CausalTree.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="525">
-          <caret line="259" column="21" selection-start-line="259" selection-start-column="21" selection-end-line="259" selection-end-column="21" />
+        <state relative-caret-position="446">
+          <caret line="502" selection-start-line="502" selection-end-line="502" />
           <folding>
             <element signature="e#0#19#0" expanded="true" />
           </folding>
