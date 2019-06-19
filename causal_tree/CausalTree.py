@@ -21,7 +21,8 @@ class CausalTree:
         self._feature_names = None
         self._num_features = None
         self._y = None
-        self._treatment_status
+        self._y_transformed = None
+        self._treatment_status = None
 
     def __str__(self):
         if self._is_fitted is False:
@@ -35,12 +36,19 @@ class CausalTree:
                            "Splitting Value": self._split_value, "Tree Depth": self.depth, "Estimate": self.value}
         return dict.__str__(string_dict)
 
+    def __repr__(self):
+        return f'Causal Tree; fitted = {str(self.is_fitted)}; id = {id(self)}'
+
     #  Property and Setter Functions
     ###################################################################################################################
 
     @property
     def y(self):
         return self._y
+
+    @property
+    def y_transformed(self):
+        return self._y_transformed
 
     @property
     def treatment_status(self):
@@ -140,8 +148,6 @@ class CausalTree:
     ###################################################################################################################
     @staticmethod
     def compute_estimated_treatment_effect_in_leaf(y, treatment_status):
-        assert len(y) == len(treatment_status)
-        assert np.array_equal(np.unique(treatment_status), np.array([0, 1]))
         if treatment_status.dtype != 'bool':
             treatment_status = np.array(treatment_status, dtype='bool')
         y_treat = y[treatment_status]
@@ -155,7 +161,7 @@ class CausalTree:
         if p is None:
             y_star = 2 * y * treatment_status - 2 * y * (1 - treatment_status)
         else:
-            pass
+            y_star = y * (treatment_status - p) / (p * (1 - p))
         return y_star
 
     @staticmethod
@@ -263,7 +269,7 @@ class CausalTree:
             return subtrees[index]
 
     @staticmethod
-    def get_optimal_subtree_via_k_fold_cv(X_learn, y_learn, k=5, thresh=0, fitted_tree=None):
+    def get_optimal_subtree_via_k_fold_cv(X_learn, y_learn, treatment_status_learn=None, k=5, thresh=0, fitted_tree=None):
         try:
             feature_names = X_learn.columns.values
         except AttributeError:
@@ -271,7 +277,7 @@ class CausalTree:
 
         if fitted_tree is None:   # Here <<X_learn>> and <<y_learn>> are used to get <<fitted_tree>> if it is passed
             fitted_tree = CausalTree()
-            fitted_tree.fit(X_learn, y_learn)
+            fitted_tree.fit(X_learn, y_learn, treatment_status_learn)
         assert(len(y_learn) == len(X_learn)), "Argument <<X_learn>> and <<y_learn>> must have the same number " \
                                               "of observations."
         X_learn = coerce_to_ndarray(X_learn)
@@ -287,7 +293,11 @@ class CausalTree:
 
         for train_index, test_index in kf.split(X_learn, y_learn):
             tmp_tree = CausalTree()
-            tmp_tree.fit(X_learn[train_index], y_learn[train_index])
+            if treatment_status_learn is None:
+                treatment_status_learn_indexed = None
+            else:
+                treatment_status_learn_indexed = treatment_status_learn[train_index]
+            tmp_tree.fit(X_learn[train_index], y_learn[train_index], treatment_status_learn_indexed)
             tree_k_max_list.append(tmp_tree)
             test_X.append(X_learn[test_index])
             test_y.append(y_learn[test_index])
@@ -318,8 +328,12 @@ class CausalTree:
     # Algorithm Implementation and Fitting Functions
     ###################################################################################################################
 
-    def find_best_splitting_point(self, X, y):
+    def is_valid_split(self, X, treatment_status, split_index, split_value, max_distance):
+        #  Here I need to check if the number of treated agents in a leaf is not further away than 4 of the number of
+        #  untreated agents
+        pass
 
+    def find_best_splitting_point(self, X, y_transformed, treatment_status, max_distance):
         n, p = X.shape
         split_index = None
         split_value = None
@@ -327,10 +341,9 @@ class CausalTree:
 
         for var_index in range(p):
             # loop through covariates
-
             x = X[:, var_index]
             sort_index = np.argsort(x)
-            sorted_x, sorted_y = x[sort_index], y[sort_index]
+            sorted_x, sorted_y, sorted_treatment = x[sort_index], y_transformed[sort_index], treatment_status[sort_index]
 
             for i in range(self._min_leaf - 1, n - self._min_leaf):
                 # loop through potential splitting points
@@ -339,34 +352,36 @@ class CausalTree:
                 if xi == sorted_x[i + 1]:
                     continue
 
-                lhs_count, lhs_loss = i + 1, compute_loss(sorted_y[:(i + 1)])
-                rhs_count, rhs_loss = n - i - 1, compute_loss(sorted_y[(i + 1):])
+                lhs_treat_effect = \
+                    CausalTree.compute_estimated_treatment_effect_in_leaf(sorted_y[:(i+1)], sorted_treatment[:(i+1)])
 
-                tmp_loss = lhs_count * lhs_loss + rhs_count * rhs_loss  # = SSE_left + SSE_right
+                rhs_treat_effect = \
+                    CausalTree.compute_estimated_treatment_effect_in_leaf(sorted_y[(i+1):], sorted_treatment[(i+1):])
 
-                if tmp_loss < loss:
+                lhs_count, lhs_loss = i + 1, np.sum((lhs_treat_effect - sorted_y[:(i + 1)])**2)
+                rhs_count, rhs_loss = n - i - 1, np.sum((rhs_treat_effect - sorted_y[(i+1):])**2)
+
+                tmp_loss = lhs_count * lhs_loss + rhs_count * rhs_loss
+
+                if tmp_loss < loss and self.is_valid_split(X, treatment_status, var_index, xi, max_distance):
                     split_index, split_value, loss = var_index, xi, tmp_loss
 
         return split_index, split_value, loss
 
-    def fit(self, X, y, treatment_status=None, min_leaf=5):  # , max_depth=10):
-        # Check Input Values
+    def fit(self, X, y, treatment_status=None, min_leaf=8, max_distance=4):
+        # Check Input Values and do stuff for root
         if self.is_root:
             assert min_leaf >= 1, "Parameter <<min_leaf>> has to be bigger than one."
-            # assert max_depth >= 1, "Parameter <<max_depth>> has to be bigger or equal than one."
             assert len(X) == len(y), "Data <<X>> and <<y>> must have the same number of observations."
             assert len(y) >= 2 * min_leaf, "Data has not enough observations for a single split to occur " \
                                            "given value of <<min_leaf>>."
             if treatment_status is None:
-                #  In case treatment_status is not given it must be that X is a pandas DataFrame, else we throw an error
                 assert 'treatment_status' in X.columns
                 treatment_status = X[['treatment_status']]
                 X = X.drop(['treatment_status'], axis=1)
             else:
                 assert len(y) == len(treatment_status)
 
-        # Do Stuff for Root
-        if self.is_root:
             try:
                 self._feature_names = X.columns.values
             except AttributeError:
@@ -374,16 +389,20 @@ class CausalTree:
             X = coerce_to_ndarray(X)  # coerce to ndarray (since all following functions expect numpy arrays)
             y = coerce_to_ndarray(y)
             treatment_status = coerce_to_ndarray(treatment_status)
+            assert np.array_equiv(np.unique(treatment_status), np.array([0, 1]))
             self._num_features = X.shape[1]
 
         # Set Parameters
         self._min_leaf = min_leaf
-        self._value = np.mean(y)
+        self._value = CausalTree.compute_estimated_treatment_effect_in_leaf(y, treatment_status)
         self._y = y
-        self._node_loss = np.sum((self._y - self._value)**2)  # = sum of squared residuals when predicting the mean
+        self._y_transformed = CausalTree.transform_outcome(y, treatment_status)
+        self._treatment_status = treatment_status
+        self._node_loss = np.sum((self.value - self.y_transformed)**2)
 
         # Actual Fitting
-        self._split_var, self._split_value, tmp_loss = self.find_best_splitting_point(X, y)
+        self._split_var, self._split_value, tmp_loss = self.find_best_splitting_point(X, y, treatment_status,
+                                                                                      max_distance)
         self._is_fitted = True
 
         if self._split_var is None:
@@ -391,7 +410,7 @@ class CausalTree:
         else:
             self._branch_loss = tmp_loss
 
-        if self._split_var is not None:  # and max_depth >= 1:
+        if self._split_var is not None:
             index = X[:, self._split_var] <= self._split_value
 
             self._left_child = CausalTree(parent=self)
@@ -399,15 +418,15 @@ class CausalTree:
             self._left_child.feature_names = self.feature_names
             self._right_child.feature_names = self.feature_names
 
-            self._left_child.fit(X[index], y[index], min_leaf)  # , max_depth-1)
-            self._right_child.fit(X[~index], y[~index], min_leaf)  # , max_depth-1)
+            self._left_child.fit(X[index], y[index], treatment_status[index], min_leaf)
+            self._right_child.fit(X[~index], y[~index], treatment_status[index], min_leaf)
 
         self.update_branch_loss()
         return self
 
     def predict_row(self, xi):
         if self.is_leaf:
-            return self._value
+            return self.value
         child = self._left_child if xi[self._split_var] <= self._split_value else self._right_child
         return child.predict_row(xi)
 
@@ -460,18 +479,6 @@ def coerce_to_ndarray(obj) -> np.ndarray:
                         "for matrices and vectors only use pandas Series, DataFrame or Numpy ndarrays")
 
 
-def compute_loss(y, loss_func=None) -> float:
-    if loss_func is None:
-        loss = np.var(y)
-    else:
-        loss = loss_func(y)
-
-    if loss is None:
-        raise ValueError("Loss function cannot be computed on the outcome vector.")
-    else:
-        return float(loss)
-
-
 def test_monotonicity_list(lst: list, strictly=True) -> bool:
     if strictly:
         return all(x < y for x, y in zip(lst, lst[1:]))
@@ -497,7 +504,3 @@ def plot(tree: CausalTree, filename=None, save=False):
     dot.render(view=True)
     if save:
         dot.save()
-
-
-#  Notes: 1) Removed max_depth criterion since we will be growing large trees anyways and therefore the only criterion
-#  necessary is the minimum_leaf_size criterion

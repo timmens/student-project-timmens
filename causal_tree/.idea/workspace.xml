@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="46b43225-fdcd-4277-9a21-19aadb0d24bf" name="Default Changelist" comment="" />
+    <list default="true" id="46b43225-fdcd-4277-9a21-19aadb0d24bf" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/simulate_treatment_data.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CausalTree.py" beforeDir="false" afterPath="$PROJECT_DIR$/CausalTree.py" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -27,8 +32,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/DecisionTree.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state>
-              <caret line="233" column="19" selection-start-line="233" selection-start-column="19" selection-end-line="233" selection-end-column="19" />
+            <state relative-caret-position="268">
+              <caret line="432" column="4" selection-start-line="432" selection-start-column="4" selection-end-line="432" selection-end-column="4" />
               <folding>
                 <element signature="e#0#19#0" expanded="true" />
               </folding>
@@ -39,11 +44,39 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/CausalTree.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="446">
-              <caret line="502" selection-start-line="502" selection-end-line="502" />
+            <state relative-caret-position="525">
+              <caret line="364" selection-start-line="364" selection-end-line="364" />
               <folding>
                 <element signature="e#0#19#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/simulate_treatment_data.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="180">
+              <caret line="12" column="40" lean-forward="true" selection-start-line="12" selection-start-column="40" selection-end-line="12" selection-end-column="40" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/README.md">
+          <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+            <state split_layout="SPLIT">
+              <first_editor />
+              <second_editor />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/simulate_data.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="75">
+              <caret line="5" column="16" selection-start-line="5" selection-start-column="16" selection-end-line="5" selection-end-column="16" />
             </state>
           </provider>
         </entry>
@@ -80,6 +113,7 @@
         <option value="$PROJECT_DIR$/simulate_data.py" />
         <option value="$PROJECT_DIR$/DecisionTreePruned.py" />
         <option value="$PROJECT_DIR$/DecisionTree.py" />
+        <option value="$PROJECT_DIR$/SimulateTreatmentData.py" />
         <option value="$PROJECT_DIR$/CausalTree.py" />
       </list>
     </option>
@@ -94,7 +128,20 @@
     <navigator proportions="" version="1">
       <foldersAlwaysOnTop value="true" />
     </navigator>
-    <panes />
+    <panes>
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="causal_tree" type="b2602c69:ProjectViewProjectNode" />
+              <item name="causal_tree" type="462c0819:PsiDirectoryNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
+      <pane id="Scope" />
+    </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
@@ -181,18 +228,19 @@
       <workItem from="1559309969805" duration="2125000" />
       <workItem from="1559833007203" duration="633000" />
       <workItem from="1560239009418" duration="1307000" />
-      <workItem from="1560846259697" duration="4119000" />
+      <workItem from="1560846259697" duration="4719000" />
+      <workItem from="1560884064571" duration="14224000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="171503000" />
+    <option name="totallyTimeSpent" value="186327000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="27" width="1366" height="741" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" weight="0.04621212" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.11760243" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -213,9 +261,9 @@
       <window_info anchor="right" id="SciView" order="3" sideWeight="0.49295774" weight="0.046969697" />
       <window_info anchor="right" id="R Graphics" order="4" sideWeight="0.49917626" weight="0.32954547" />
       <window_info anchor="right" id="R Packages" order="5" />
-      <window_info anchor="right" x="0" y="0" width="120" height="541" id="Documentation" order="6" sideWeight="0.50912106" side_tool="true" visible="true" weight="0.025796661" />
+      <window_info anchor="right" x="0" y="0" width="120" height="541" id="Documentation" order="6" sideWeight="0.51077944" side_tool="true" visible="true" weight="0.025796661" />
       <window_info active="true" anchor="right" x="683" y="64" width="683" height="704" id="Python Console" maximized="true" order="7" sideWeight="0.49209931" type="WINDOWED" visible="true" weight="0.24675325" />
-      <window_info anchor="right" id="Database" order="8" sideWeight="0.49087894" visible="true" weight="0.025796661" />
+      <window_info anchor="right" id="Database" order="8" sideWeight="0.48922056" visible="true" weight="0.025796661" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -238,25 +286,40 @@
     <entry file="file://$PROJECT_DIR$/decisionnode.py" />
     <entry file="file://$PROJECT_DIR$/simulate_data.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="9" selection-start-column="9" selection-end-column="9" />
+        <state relative-caret-position="75">
+          <caret line="5" column="16" selection-start-line="5" selection-start-column="16" selection-end-line="5" selection-end-column="16" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/DecisionTree.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret line="233" column="19" selection-start-line="233" selection-start-column="19" selection-end-line="233" selection-end-column="19" />
+        <state relative-caret-position="268">
+          <caret line="432" column="4" selection-start-line="432" selection-start-column="4" selection-end-line="432" selection-end-column="4" />
           <folding>
             <element signature="e#0#19#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor />
+          <second_editor />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/simulate_treatment_data.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="12" column="40" lean-forward="true" selection-start-line="12" selection-start-column="40" selection-end-line="12" selection-end-column="40" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/CausalTree.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="446">
-          <caret line="502" selection-start-line="502" selection-end-line="502" />
+        <state relative-caret-position="525">
+          <caret line="364" selection-start-line="364" selection-end-line="364" />
           <folding>
             <element signature="e#0#19#0" expanded="true" />
           </folding>

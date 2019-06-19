@@ -30,7 +30,8 @@ As described above, this class will build on the class DecisionTree.py; however,
 ### TODO (CausalTree) 
 1. Implement treatment effect estimation function for each leaf [DONE]
 2. Construct function to transform the outcome accordingly (needed for new metric) [DONE]
-3. Write code for new metric, here we need to adjust a lot of previous code [In the making] 
+3. Write code for new metric, here we need to adjust a lot of previous code [DONE]
+4. Implement function that checks if the number of treated and untreated agents in a new leaf is approx. equal [NOT done] 
 
 
 ### TOCHECK
