@@ -2,9 +2,9 @@ import numpy as np
 
 
 def simulate_treatment_data(agents=100):
-    x = np.random.normal(0, 1, size=2*agents).reshape((agents, 2))
-    treatment_status = np.random.binomial(1, .5, agents)
-    treatment_index  = np.array(treatment_status, dtype='bool')
+    x = np.random.normal(0, 1, size=2 * agents).reshape((agents, 2))
+    treatment_status = np.random.binomial(1, 0.5, agents)
+    treatment_index = np.array(treatment_status, dtype="bool")
     index0 = x[:, 0] > 0
     index1 = x[:, 1] > 0
 

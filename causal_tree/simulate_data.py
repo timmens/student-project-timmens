@@ -2,7 +2,7 @@ import numpy as np
 
 
 def simulate_data(agents=100):
-    x = np.random.normal(0, 1, size=2*agents).reshape((agents, 2))
+    x = np.random.normal(0, 1, size=2 * agents).reshape((agents, 2))
     index0 = x[:, 0] > 0
     index1 = x[:, 1] > 0
     index = np.column_stack((index0, index1))
