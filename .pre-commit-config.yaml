@@ -9,3 +9,4 @@ repos:
     rev: 3.7.1
     hooks:
     - id: flake8
+      args: ['--config=setup.cfg --ignore=E203,W503']
