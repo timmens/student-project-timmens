@@ -12,6 +12,8 @@ class CausalTree:
         self._right_child = None
         self._value = None
         self._min_leaf = None
+        self._max_distance = None
+        self._crit_num_obs = None
         self._split_var = None
         self._split_value = None
         self._node_loss = None
@@ -22,6 +24,7 @@ class CausalTree:
         self._y = None
         self._y_transformed = None
         self._treatment_status = None
+        self._cv_error = None
 
     def __str__(self):
         if self._is_fitted is False:
@@ -50,7 +53,6 @@ class CausalTree:
         return f"Causal Tree; fitted = {str(self.is_fitted)}; id = {id(self)}"
 
     #  Property and Setter Functions
-    ###################################################################################################################
 
     @property
     def y(self):
@@ -85,6 +87,10 @@ class CausalTree:
         self._left_child = node
 
     @property
+    def cv_error(self):
+        return self._cv_error
+
+    @property
     def feature_names(self):
         return self._feature_names
 
@@ -103,7 +109,8 @@ class CausalTree:
             return self._left_child is None
         else:
             print(
-                "The tree has not been fitted yet, hence it is root and leaf at the same time.\n"
+                "The tree has not been fitted yet, "
+                "hence it is root and leaf at the same time.\n"
             )
             return True
 
@@ -117,8 +124,6 @@ class CausalTree:
 
     @property
     def number_of_leafs(self):
-        # Because this is a property and not an attribute it gets updated automatically when it is called
-        # however this might be a little inefficient, we will see
         return CausalTree.get_number_of_leafs(self)
 
     @property
@@ -134,8 +139,19 @@ class CausalTree:
         self.update_branch_loss()
         return self._branch_loss
 
+    @property
+    def min_leaf(self):
+        return self._min_leaf
+
+    @property
+    def max_distance(self):
+        return self._max_distance
+
+    @property
+    def crit_num_obs(self):
+        return self._crit_num_obs
+
     # Various Auxiliary Functions
-    ###################################################################################################################
 
     def update_branch_loss(self):
         leaf_list = CausalTree.get_leafs_in_list(self)
@@ -160,18 +176,6 @@ class CausalTree:
                 )
 
     # Static Methods (Some of which should probably not be static methods)
-    ###################################################################################################################
-    @staticmethod
-    def estimate_treatment_in_leaf(y, treatment_status):
-        if treatment_status.dtype != "bool":
-            treatment_status = np.array(treatment_status, dtype="bool")
-        y_treat = y[treatment_status]
-        y_untreat = y[~treatment_status]
-        assert (
-            np.abs(len(y_untreat) - len(y_treat)) > 4
-            and (len(y_treat) + len(y_untreat)) < 9
-        ), "man you got a problem"
-        return y_treat.mean() - y_untreat.mean()
 
     @staticmethod
     def transform_outcome(y, treatment_status, p=None):
@@ -222,7 +226,7 @@ class CausalTree:
         return max(depth_left, depth_right)
 
     @staticmethod
-    def validate(tree, X_test, y_test, metric=None):
+    def validate(tree, X_test, y_transformed_test, metric=None):
         #  returns assumed validation metric on predicted and true outcomes
         if metric is None:
 
@@ -232,7 +236,7 @@ class CausalTree:
                 )  # if no metric is given Mean Squared Error is used (MSE)
 
         y_pred = tree.predict(X_test)
-        return np.mean(metric(y_pred, y_test))
+        return np.sum(metric(y_pred, y_transformed_test))
 
     @staticmethod
     def get_first_subtree(fitted_tree, thresh=None):
@@ -245,6 +249,8 @@ class CausalTree:
         for i in range(depth):
             for parent_node in CausalTree.get_level_in_list(subtree, depth - i - 1):
                 if parent_node.left_child is not None:
+                    parent_node.left_child.update_branch_loss()
+                    parent_node.right_child.update_branch_loss()
                     if (
                         parent_node.node_loss
                         <= parent_node.left_child.node_loss
@@ -266,10 +272,7 @@ class CausalTree:
             fitted_tree, CausalTree
         ), "This method only works on Decision Trees"
         if not fitted_tree.is_fitted:
-            raise ValueError(
-                "This method only works on fitted trees"
-            )  # here we throw an error instead of using
-            # assert since this error can be solved by fitting the tree and then calling the function again
+            raise ValueError("This method only works on fitted trees")
 
         alphas = [0]
         subtrees = [
@@ -299,7 +302,7 @@ class CausalTree:
         }  # i think i want: return alphas, subtrees
 
     @staticmethod
-    def get_subtree_corresponding_to_arbitrary_alpha(tree, alpha, thresh):
+    def get_subtree_given_alpha(tree, alpha, thresh):
         sequences = CausalTree.get_pruned_tree_and_alpha_sequence(tree, thresh)
         alphas = sequences["alphas"]
         subtrees = sequences["subtrees"]
@@ -312,16 +315,20 @@ class CausalTree:
 
     @staticmethod
     def get_optimal_subtree_via_k_fold_cv(
-        X_learn, y_learn, treatment_status_learn=None, k=5, thresh=0, fitted_tree=None
+        X_learn,
+        y_learn,
+        treatment_status_learn=None,
+        k=5,
+        thresh=0,
+        sparsity_bias=1,
+        fitted_tree=None,
     ):
         try:
             feature_names = X_learn.columns.values
         except AttributeError:
             feature_names = None
 
-        if (
-            fitted_tree is None
-        ):  # Here <<X_learn>> and <<y_learn>> are used to get <<fitted_tree>> if it is passed
+        if fitted_tree is None:
             fitted_tree = CausalTree()
             fitted_tree.fit(X_learn, y_learn, treatment_status_learn)
         assert len(y_learn) == len(X_learn), (
@@ -337,27 +344,27 @@ class CausalTree:
             tree_max, thresh
         )
         tree_k_max_list = []  # list of maximal trees in each cross validation sample
-        tree_k_subtree_dict = []
+        tree_k_subtree_list = []
         test_X = []
         test_y = []
+        test_treatment_status = []
 
         for train_index, test_index in kf.split(X_learn, y_learn):
             tmp_tree = CausalTree()
             if treatment_status_learn is None:
-                treatment_status_learn_indexed = None
+                train_treatment_status = None
             else:
-                treatment_status_learn_indexed = treatment_status_learn[train_index]
+                train_treatment_status = treatment_status_learn[train_index]
             tmp_tree.fit(
-                X_learn[train_index],
-                y_learn[train_index],
-                treatment_status_learn_indexed,
+                X_learn[train_index], y_learn[train_index], train_treatment_status
             )
             tree_k_max_list.append(tmp_tree)
             test_X.append(X_learn[test_index])
             test_y.append(y_learn[test_index])
+            test_treatment_status.append(treatment_status_learn[test_index])
 
         for tree in tree_k_max_list:
-            tree_k_subtree_dict.append(
+            tree_k_subtree_list.append(
                 CausalTree.get_pruned_tree_and_alpha_sequence(tree, thresh)
             )
 
@@ -368,44 +375,60 @@ class CausalTree:
         for alpha in alphas:
             err_alpha = 0
             for k, cv_tree in enumerate(tree_k_max_list):
-                cv_alpha_subtree = CausalTree.get_subtree_corresponding_to_arbitrary_alpha(
+                cv_alpha_subtree = CausalTree.get_subtree_given_alpha(
                     cv_tree, alpha, thresh
                 )
-                err_alpha += CausalTree.validate(cv_alpha_subtree, test_X[k], test_y[k])
+                test_y_transformed = CausalTree.transform_outcome(
+                    test_y[k], test_treatment_status[k]
+                )
+                err_alpha += CausalTree.validate(
+                    cv_alpha_subtree, test_X[k], test_y_transformed
+                )
 
             alpha_cv_errors.append(err_alpha / k)
 
         alpha_cv_errors = np.array(alpha_cv_errors)
-        optimal_index = int(
-            np.where(alpha_cv_errors == alpha_cv_errors.min())[0]
-        )  # if multiple trees achieve the
-        # same alpha, am I taking the smalles one, what is with 1.5 standard deviations ???
+        optimal_index = int(np.where(alpha_cv_errors == alpha_cv_errors.min())[0][-1])
+        sparsity_adjustment = sparsity_bias * np.std(alpha_cv_errors)
+        optimal_sparse_index = int(
+            np.where(
+                alpha_cv_errors < alpha_cv_errors[optimal_index] + sparsity_adjustment
+            )[0][-1]
+        )
         optimal_subtree = potential_subtrees[optimal_index]
         optimal_subtree.feature_names = feature_names
-
-        return optimal_subtree
+        optimal_subtree._cv_error = alpha_cv_errors[optimal_index]
+        optimal_sparse_subtree = potential_subtrees[optimal_sparse_index]
+        optimal_sparse_subtree.feature_names = feature_names
+        optimal_sparse_subtree._cv_error = alpha_cv_errors[optimal_sparse_index]
+        return optimal_sparse_subtree, optimal_subtree
 
     # Algorithm Implementation and Fitting Functions
-    ###################################################################################################################
 
-    def is_valid_split(
-        self, X, treatment_status, split_index, split_value, max_distance
-    ):
-        #  Here I need to check if the number of treated agents in a leaf is not further away than 4 of the number of
-        #  untreated agents
-        index_left = X[:, split_index] < split_value
-        num_treated_left = np.sum(treatment_status[index_left])
-        num_untreated_left = np.sum(index_left) - num_treated_left
-        num_treated_right = np.sum(treatment_status[~index_left])
-        num_untreated_right = np.sum(~index_left) - num_treated_right
-        return (
-            np.abs(num_treated_left - num_untreated_left) > max_distance
-            or np.abs(num_treated_right - num_untreated_right) > max_distance
+    @staticmethod
+    def estimate_treatment_in_leaf(y, treatment_status):
+        if treatment_status.dtype != "bool":
+            treatment_status = np.array(treatment_status, dtype="bool")
+        y_treat = y[treatment_status]
+        y_untreat = y[~treatment_status]
+        return y_treat.mean() - y_untreat.mean()
+
+    def is_valid_split(self, sorted_treatment, index):
+        sorted_treat_left = sorted_treatment[: (index + 1)]
+        sorted_treat_right = sorted_treatment[(index + 1) :]
+        valid_left = (
+            len(sorted_treat_left) > self.crit_num_obs
+            or np.abs(np.sum(sorted_treat_left) - np.sum(1 - sorted_treat_left))
+            <= self.max_distance
         )
+        valid_right = (
+            len(sorted_treat_right) > self.crit_num_obs
+            or np.abs(np.sum(sorted_treat_right) - np.sum(1 - sorted_treat_right))
+            <= self.max_distance
+        )
+        return valid_left and valid_right
 
-    def find_best_splitting_point(
-        self, X, y_transformed, treatment_status, max_distance
-    ):
+    def find_best_splitting_point(self, X):
         n, p = X.shape
         split_index = None
         split_value = None
@@ -417,44 +440,40 @@ class CausalTree:
             sort_index = np.argsort(x)
             sorted_x, sorted_y, sorted_treatment = (
                 x[sort_index],
-                y_transformed[sort_index],
-                treatment_status[sort_index],
+                self.y[sort_index],
+                self.treatment_status[sort_index],
             )
 
             for i in range(self._min_leaf - 1, n - self._min_leaf):
                 # loop through potential splitting points
 
-                xi, yi = sorted_x[i], sorted_y[i]
+                xi = sorted_x[i]
                 if xi == sorted_x[i + 1]:
                     continue
 
-                lhs_treat_effect = CausalTree.estimate_treatment_in_leaf(
+                if not self.is_valid_split(sorted_treatment, i):
+                    continue
+
+                lhs_treat_effect = self.estimate_treatment_in_leaf(
                     sorted_y[: (i + 1)], sorted_treatment[: (i + 1)]
                 )
 
-                rhs_treat_effect = CausalTree.estimate_treatment_in_leaf(
+                rhs_treat_effect = self.estimate_treatment_in_leaf(
                     sorted_y[(i + 1) :], sorted_treatment[(i + 1) :]
                 )
 
-                lhs_count, lhs_loss = (
-                    i + 1,
-                    np.sum((lhs_treat_effect - sorted_y[: (i + 1)]) ** 2),
-                )
-                rhs_count, rhs_loss = (
-                    n - i - 1,
-                    np.sum((rhs_treat_effect - sorted_y[(i + 1) :]) ** 2),
-                )
+                lhs_loss = np.sum((lhs_treat_effect - sorted_y[: (i + 1)]) ** 2)
+                rhs_loss = np.sum((rhs_treat_effect - sorted_y[(i + 1) :]) ** 2)
 
-                tmp_loss = lhs_count * lhs_loss + rhs_count * rhs_loss
-
-                if tmp_loss < loss and self.is_valid_split(
-                    X, treatment_status, var_index, xi, max_distance
-                ):
+                tmp_loss = lhs_loss + rhs_loss
+                if tmp_loss < loss:
                     split_index, split_value, loss = var_index, xi, tmp_loss
 
         return split_index, split_value, loss
 
-    def fit(self, X, y, treatment_status=None, min_leaf=8, max_distance=4):
+    def fit(
+        self, X, y, treatment_status=None, min_leaf=8, max_distance=4, crit_num_obs=None
+    ):
         # Check Input Values and do stuff for root
         if self.is_root:
             assert min_leaf >= 1, "Parameter <<min_leaf>> has to be bigger than one."
@@ -476,26 +495,26 @@ class CausalTree:
                 self._feature_names = X.columns.values
             except AttributeError:
                 pass
-            X = coerce_to_ndarray(
-                X
-            )  # coerce to ndarray (since all following functions expect numpy arrays)
+            X = coerce_to_ndarray(X)  # coerce to ndarray
             y = coerce_to_ndarray(y)
             treatment_status = coerce_to_ndarray(treatment_status)
             assert np.array_equiv(np.unique(treatment_status), np.array([0, 1]))
             self._num_features = X.shape[1]
+            if crit_num_obs is None:
+                crit_num_obs = 4 * max_distance
 
         # Set Parameters
         self._min_leaf = min_leaf
-        self._value = CausalTree.estimate_treatment_in_leaf(y, treatment_status)
+        self._max_distance = max_distance
+        self._crit_num_obs = crit_num_obs
+        self._value = self.estimate_treatment_in_leaf(y, treatment_status)
         self._y = y
         self._y_transformed = CausalTree.transform_outcome(y, treatment_status)
         self._treatment_status = treatment_status
         self._node_loss = np.sum((self.value - self.y_transformed) ** 2)
 
         # Actual Fitting
-        self._split_var, self._split_value, tmp_loss = self.find_best_splitting_point(
-            X, y, treatment_status, max_distance
-        )
+        self._split_var, self._split_value, tmp_loss = self.find_best_splitting_point(X)
         self._is_fitted = True
 
         if self._split_var is None:
@@ -512,10 +531,20 @@ class CausalTree:
             self._right_child.feature_names = self.feature_names
 
             self._left_child.fit(
-                X[index], y[index], treatment_status[index], min_leaf, max_distance
+                X[index],
+                y[index],
+                treatment_status[index],
+                min_leaf,
+                max_distance,
+                crit_num_obs,
             )
             self._right_child.fit(
-                X[~index], y[~index], treatment_status[~index], min_leaf, max_distance
+                X[~index],
+                y[~index],
+                treatment_status[~index],
+                min_leaf,
+                max_distance,
+                crit_num_obs,
             )
 
         self.update_branch_loss()
@@ -544,7 +573,6 @@ class CausalTree:
 
 
 #  General Function (Some of which might be static methods in a strict sense)
-#######################################################################################################################
 
 
 def pre_order_traverse_tree(root: CausalTree, func=None) -> list:
@@ -587,7 +615,8 @@ def coerce_to_ndarray(obj) -> np.ndarray:
     else:
         raise TypeError(
             "Object was given with inappropriate type;"
-            "for matrices and vectors only use pandas Series, DataFrame or Numpy ndarrays"
+            "for matrices and vectors only use pandas Series, "
+            "DataFrame or Numpy ndarrays"
         )
 
 
@@ -599,6 +628,10 @@ def test_monotonicity_list(lst: list, strictly=True) -> bool:
 
 
 def plot(tree: CausalTree, filename=None, save=False):
+    if tree.is_fitted is False:
+        print("The tree must be fitted in order to be plotted")
+        return
+
     if filename is None:
         filename = "regression_tree.svg"
     dot = Graph(name="regression_tree", filename=filename, format="svg")
