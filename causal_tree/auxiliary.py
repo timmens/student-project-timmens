@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from graphviz import Graph
 
 
 def plot_figure1(width=8, height=5):
@@ -25,3 +26,27 @@ def plot_figure1(width=8, height=5):
     ax.set_title("Figure 1")
     plt.rcParams["figure.figsize"] = [width, height]
     fig.show()
+
+
+def plot_figure2(ratio, width, height):
+    dot = Graph(name="Figure 2")
+    dot.attr(ratio=f"{ratio}", size=f"{width}, {height}!", label="Figure 2")
+    # dot.node_attr.update(color='deepskyblue3', style='filled')
+    dot.node("root", "x1 < 0")
+    dot.node("lc", "0")
+    dot.node("rc", "x2 < 0")
+    dot.node("rlc", "5")
+    dot.node("rrc", "x1 < 2")
+    dot.node("rrlc", "2")
+    dot.node("rrrc", "x2 < -2")
+    dot.node("rrrlc", "4")
+    dot.node("rrrrc", "0")
+    dot.edge("root", "lc")
+    dot.edge("root", "rc")
+    dot.edge("rc", "rlc")
+    dot.edge("rc", "rrc")
+    dot.edge("rrc", "rrlc")
+    dot.edge("rrc", "rrrc")
+    dot.edge("rrrc", "rrrlc")
+    dot.edge("rrrc", "rrrrc")
+    return dot

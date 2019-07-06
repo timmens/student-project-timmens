@@ -23,15 +23,8 @@ This class finalizes step one; It contains all the relevant functions to fit a r
   plot(optimal_tree) # plots tree in a hierachical (upside-down) tree like structure 
   ``` 
 
-## CausalTree.py [In the making..]
+## CausalTree.py [DONE]
 As described above, this class will build on the class DecisionTree.py; however, at the relevant places changes will be made as illustrated in Athey (2015). 
-
-
-### TODO (CausalTree) 
-1. Implement treatment effect estimation function for each leaf [DONE]
-2. Construct function to transform the outcome accordingly (needed for new metric) [DONE]
-3. Write code for new metric, here we need to adjust a lot of previous code [DONE]
-4. Implement function that checks if the number of treated and untreated agents in a new leaf is approx. equal [NOT done] 
 
 
 ### TOCHECK

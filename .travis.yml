@@ -1,15 +1,21 @@
 language: python
 
 python:
-   - 3.7
+  - 3.6
 
 bundler_args: --retry 3
 
 install:
-   - sudo apt-get update
-   # here
-   #
-# do some things before_install
-# call some script to be checked 
-# script: 
-#    
+  - sudo apt-get update
+  - sudo apt-get upgrade
+  - ./utils/travis_miniconda.sh
+  - PATH="$HOME/miniconda/bin:$PATH"
+  - conda env create -f environment.yml 
+  
+  - wget https://cran.r-project.org/src/contrib/ICC_2.3.0.tar.gz
+  - R CMD INSTALL ICC_2.3.0.tar.gz 
+
+script: 
+  - source .envrc 
+#  - travis_wait run-notebook
+#  - travis_wait run-slide

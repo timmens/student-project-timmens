@@ -1,0 +1,27 @@
+name: student-project-timmens
+
+channels:
+- conda
+- conda-forge
+- r
+
+dependencies:
+- numpy
+- pandas
+- pandas-datareader
+- black 
+- flake8
+- pytest
+- scipy=1.2.1
+- jupyterlab
+- matplotlib
+- seaborn
+- jupyter
+- jupyter_contrib_nbextensions
+- jupyter_nbextensions_configurator
+- pip
+- graphviz
+- rise
+- r-essentials
+- rpy2
+- simplegeneric
