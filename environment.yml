@@ -8,20 +8,20 @@ channels:
 dependencies:
 - numpy
 - pandas
-- pandas-datareader
+  #- pandas-datareader
 - black 
 - flake8
-- pytest
-- scipy=1.2.1
+  #- pytest
+  #- scipy=1.2.1
 - jupyterlab
 - matplotlib
-- seaborn
+  #- seaborn
 - jupyter
 - jupyter_contrib_nbextensions
 - jupyter_nbextensions_configurator
 - pip
 - graphviz
-- rise
+  #- rise
 - r-essentials
 - rpy2
-- simplegeneric
+  #- simplegeneric
