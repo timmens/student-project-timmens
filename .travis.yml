@@ -9,8 +9,8 @@ install:
   - sudo apt-get update
   - ./utils/travis_miniconda.sh
   - PATH="$HOME/miniconda/bin:$PATH"
-    #  - wget https://cran.r-project.org/src/contrib/ICC_2.3.0.tar.gz
-    #- R CMD INSTALL ICC_2.3.0.tar.gz 
+  
+  
   - hash -r
   - conda config --set always_yes yes --set changeps1 no
   - conda update -q conda
@@ -19,7 +19,9 @@ install:
   - conda info -a
   - conda env create -f environment.yml 
   - source activate student-project-timmens
-    #script: 
-#  - source .envrc 
+  - wget https://cran.r-project.org/src/contrib/ICC_2.3.0.tar.gz
+  - R CMD INSTALL ICC_2.3.0.tar.gz 
+script: 
+  - source .envrc 
 #  - travis_wait run-notebook
 #  - travis_wait run-slide

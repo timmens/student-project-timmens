@@ -1,4 +1,5 @@
-# Causal Tree 
+# [Causal Tree](https://nbviewer.jupyter.org/github/HumanCapitalAnalysis/student-project-timmens/blob/master/causal_tree/methodology.ipynb) [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/HumanCapitalAnalysis/student-project-timmens/master?filepath=causal_tree%2Fmethodology.ipynb)
+
 ## Info 
 This part of the project is written in python code only. We will use PyCharm locally and **not** use JupyterLab for this part. This is mainly due to the fact that we are implementing a machine learning algorithm which is class and function based (i.e. no need for visual feedback). The causal tree algorithm is very similar to the classical decision tree algorithm presented in Breiman (1994) and Tibshirani, Hastie (2001, 2013). Hence our strategy is characterized as follows. 
 

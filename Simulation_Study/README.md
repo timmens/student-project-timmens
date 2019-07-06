@@ -1,5 +1,5 @@
-# Simulation Study + (Data example)
-## Please make sure to view the notebook via the nbviewer https://nbviewer.jupyter.org/
+# [Simulation Study (and Data Example)](https://nbviewer.jupyter.org/github/HumanCapitalAnalysis/student-project-timmens/blob/master/Simulation_Study/First_writeup.ipynb) [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/HumanCapitalAnalysis/student-project-timmens/master?filepath=Simulation_Study%2FFirst_writeup.ipynb)
+
 ## Description
 This simulation study will use different data generating processes to illustrate the importance of heterogeneous treatment effects. I'll start out with settings that can be tackled with off-the-shelf estimation techniques and will gradually increase the level of sophistication inherent to the settings to work out the benefits of using causal trees/forests. The latter exercise builds upon the first part of our joint project by Tim, and will be conducted using data from a randomized experiment as well as simulated data. For the (C)ATE, the estimation routines to be compared include:  The Naive estimator, Propensity Score Weighting, k-NN matching, OLS, local linear kernel regression, and causal forests.
 
