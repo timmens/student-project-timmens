@@ -18,7 +18,8 @@ install:
   - conda config --add channels r
   - conda info -a
   - conda env create -f environment.yml 
-script: 
-  - source .envrc 
+  - source activate student-project-timmens
+    #script: 
+#  - source .envrc 
 #  - travis_wait run-notebook
 #  - travis_wait run-slide
