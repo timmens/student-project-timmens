@@ -1,5 +1,7 @@
 import numpy as np
-import matplotlib.pyplot as plt
+from matplotlib import pyplot as plt
+
+# import matplotlib.pyplot as plt
 from graphviz import Graph
 
 
@@ -20,12 +22,17 @@ def plot_figure1(width=8, height=5):
 
     ax.view_init(30, 230)
     ax.plot_surface(X1, X2, Y, rstride=1, cstride=1, cmap="viridis", edgecolor="none")
-    ax.set_xlabel("x1")
-    ax.set_ylabel("x2")
-    ax.set_zlabel("y")
-    ax.set_title("Figure 1")
+    plt.xlabel("x1", fontsize=20)
+    plt.ylabel("x2", fontsize=20)
+    fig.suptitle("Figure 1", fontsize=30)
+    #    ax.set_xlabel("x1")
+    #    ax.set_ylabel("x2")
+    #    ax.set_zlabel("y")
+    #    ax.set_title("Figure 1")
+    #    ax.xaxis.label.set_size(40)
+    #    ax.yaxis.label.set_size(40)
+    #    ax.zaxis.label.set_size(40)
     plt.rcParams["figure.figsize"] = [width, height]
-    fig.show()
 
 
 def plot_figure2(ratio, width, height):
