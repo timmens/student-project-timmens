@@ -13,4 +13,4 @@ Here we first implement a classical regression tree algorithm, since their metho
 
 In this section we will compare popular methods used to estimate treatment effects in a heterogenous treatment setting. See folder Simulation_Study for for a more detailed discussion.
 
-[![Build Status](https://travis-ci.org/HumanCapitalAnalysis/student-project-timmens.svg?branch=master)](https://travis-ci.org/HumanCapitalAnalysis/student-project-timmens) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](HumanCapitalAnalysis/student-project-timmens/blob/master/LICENSE)
+[![Build Status](https://travis-ci.org/HumanCapitalAnalysis/student-project-timmens.svg?branch=master)](https://travis-ci.org/HumanCapitalAnalysis/student-project-timmens) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](HumanCapitalAnalysis/student-project-timmens/blob/master/LICENSE) <a href="https://github.com/python/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a>
