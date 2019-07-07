@@ -8,7 +8,7 @@ by Susan Athey and Guido Imbens (2016); see reference below. Their method is hea
 
 
 ## Causal Tree 
-<a href="https://nbviewer.jupyter.org/github/comet-ml/comet-examples/blob/master/notebooks/Comet-REST-API.ipynb" 
+<a href="https://nbviewer.jupyter.org/github/HumanCapitalAnalysis/student-project-timmens/blob/master/causal_tree/causal_tree.ipynb"
    target="_parent">
    <img align="center" 
   src="https://raw.githubusercontent.com/jupyter/design/master/logos/Badges/nbviewer_badge.png" 
