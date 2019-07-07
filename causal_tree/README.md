@@ -18,13 +18,13 @@ In this part of the project we will focus on implementing the causal tree algori
 
 
 <font size=2>[1]: See notebook `decision_tree_testing.ipynb` for a visual check on estimation performance of the decision tree implementation by pressing buttons on the right.</font>
-<a href="https://nbviewer.jupyter.org/github/HumanCapitalAnalysis/student-project-timmens/blob/master/causal_tree/causal_tree.ipynb"
+<a href="https://nbviewer.jupyter.org/github/HumanCapitalAnalysis/student-project-timmens/blob/master/causal_tree/decision_tree_testing.ipynb"
    target="_parent">
    <img align="center" 
   src="https://raw.githubusercontent.com/jupyter/design/master/logos/Badges/nbviewer_badge.png" 
       width="80" height="15">
 </a>
-<a href="https://mybinder.org/v2/gh/HumanCapitalAnalysis/student-project-timmens/master?filepath=causal_tree%2Fcausal_tree.ipynb" 
+<a href="https://mybinder.org/v2/gh/HumanCapitalAnalysis/student-project-timmens/master?filepath=causal_tree%2Fdecision_tree_testing.ipynb" 
     target="_parent">
     <img align="center" 
        src="https://mybinder.org/badge_logo.svg" 
