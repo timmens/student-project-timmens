@@ -21,7 +21,7 @@ by Susan Athey and Guido Imbens (2016); see reference below. Their method is hea
        width="109" height="20">
 </a> 
 
-In this section we will work on a Python implementation of the algorithm `CausalTree.py` as well as on an illustrative notebook. The notebook will contain a concise explaination of the mathematics behind Causal Trees, along with an outlook on the use of more involved algorithms. 
+In this section we will work on a Python implementation of the algorithm (`CausalTree.py`) as well as on an illustrative notebook. The notebook will contain a concise explaination of the mathematics behind Causal Trees, along with an outlook on the use of more involved algorithms. 
 
 ## Simulation Study 
 <a href="https://nbviewer.jupyter.org/github/HumanCapitalAnalysis/student-project-timmens/blob/master/Simulation_Study/First_writeup.ipynb" 
