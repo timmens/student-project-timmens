@@ -1,4 +1,4 @@
-<font size=6>Causal Tree </font>
+# Causal Tree
 <a href="https://nbviewer.jupyter.org/github/HumanCapitalAnalysis/student-project-timmens/blob/master/causal_tree/causal_tree.ipynb"
    target="_parent">
    <img align="center" 
@@ -32,7 +32,7 @@ In this part of the project we will focus on implementing the causal tree algori
        width="80" height="15">
 </a>
 
-## DecisionTree.py
+## `DecisionTree.py`
 This class finalizes step one; It contains all the relevant functions to fit a regression tree on given data using an arbitrary loss function for split point evaluation. Furthermore, in contrast to the decision tree implemented in scikit-learn, this class also implements the important pruning algorithm guarding against overfitting. See [Hastie et.al. 2009](https://web.stanford.edu/~hastie/ElemStatLearn/) for the standard decision tree algorithm; see [PennState Stat508 Course](https://newonlinecourses.science.psu.edu/stat508/lesson/11/11.8) for an excellent introduction to minimal-cost complexity pruning (detailed references are found below).
 
 #### Example Code
@@ -48,7 +48,7 @@ print(optimal_tree) # displays some relevant information on the tree
 plot(optimal_tree)  # plots tree in a hierachical (upside-down) tree like structure 
 ``` 
 
-## CausalTree.py
+## `CausalTree.py`
 As described above, this class will build on the class `DecisionTree`; however, at relevant places changes will be made as illustrated in Athey
 and Imbens 2016. In particular since individual treatment effects are not observed, to use standard supervised machine learning techniques we have to propose a pre-estimate. See main notebook for more detailed information. 
 
@@ -66,8 +66,6 @@ ctree_sparse, ctree_opt = ctree.apply_kFold_CV(X, y, k=5, fitted_tree=ctree) # h
 print(ctree_sparse) # displays some relevant information on the tree
 plot(ctree_sparse)  # plots tree in a hierachical (upside-down) tree like structure 
 ``` 
-
-## causal_tree.ipynb
 
 ## References
 
