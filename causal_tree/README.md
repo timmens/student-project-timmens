@@ -12,7 +12,6 @@
        width="109" height="20">
 </a>
 
----
 ## Abstract 
 
 In this part of the project we will focus on implementing the causal tree algorithm formulated in *Recursive partitioning for heterogeneous causal effects*, published 2016 by Susan Athey and Guido Imbens; see reference below. Their algorithm structure is guided heavily by the classification and regression tree algorithm (see reference below). Hence, in step one we start our project by building a working implementation of the classical (regression) decision tree algorithm. Having verified the prediction capabilities of our implementation on the famous Iris data set, we devote our attention to the causal tree algorithm.<sup>1</sup> In the construction of `CausalTree.py` we closely follow Athey and Imbens 2016 in building our extension on the classical regression tree algorithm. Using the finished implementation we let our algorithm loose on simulated and real data comparing the results to an official library. Our findings and a concise mathematical explaination of the methods is presented in a small notebook &ndash;open this notebook by clicking one of the buttons above.
