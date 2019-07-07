@@ -13,7 +13,7 @@
 </a>
 
 ---
-<font color="red", size=12>This README is under construction. The finished product will contain an abstract, list of relevant files, example code for `.py`-files and a detailed explaination of the project in general as well as references to the corresponding literature. </font>
+<font color="red" size=8>This README is under construction. The finished product will contain an abstract, list of relevant files, example code for `.py`-files and a detailed explaination of the project in general as well as references to the corresponding literature. </font>
 ---
 ## DecisionTree.py [DONE]
 This class finalizes step one; It contains all the relevant functions to fit a regression tree on given data using an arbitrary loss function for split point evaluation. Furthermore, in contrast to the decision tree implemented in scikit-learn, this class also implements the important pruning algorithm guarding against overfitting. See [Hastie et.al. 2009](https://web.stanford.edu/~hastie/ElemStatLearn/) for the standard decision tree algorithm; see [PennState Stat508 Course](https://newonlinecourses.science.psu.edu/stat508/lesson/11/11.8) for an excellent introduction to minimal-cost complexity pruning.
