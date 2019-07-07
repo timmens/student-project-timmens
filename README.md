@@ -14,7 +14,7 @@ by Susan Athey and Guido Imbens (2016); see reference below. Their method is hea
   src="https://raw.githubusercontent.com/jupyter/design/master/logos/Badges/nbviewer_badge.png" 
       width="109" height="20">
 </a> 
-<a href="https://mybinder.org/v2/gh/HumanCapitalAnalysis/student-project-timmens/master?filepath=causal_tree%2Fmethodology.ipynb" 
+<a href="https://mybinder.org/v2/gh/HumanCapitalAnalysis/student-project-timmens/master?filepath=causal_tree%2Fcausal_tree.ipynb" 
     target="_parent">
     <img align="center" 
        src="https://mybinder.org/badge_logo.svg" 
