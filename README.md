@@ -1,12 +1,12 @@
 # Student Project - Tim Mensinger and Florian Schoner
----
----
+
+
 ## Abstract
 
-In this project we try to understand newly proposed methods for computing heterogenous treatment effects that leverage regression and classification approaches from the machine learning literature. In particular we are interested in the new method *Causal Trees*, first proposed in [*Recursive partitioning for heterogeneous causal effects (2016)*](https://www.pnas.org/content/113/27/7353),
-by Susan Athey and Guido Imbens; see reference below. Their method is heavily based upon the famous classification and regression tree algorithm, illustrated in the same-titled book by Breiman et al. 1984; see reference below. The project will be split in two parts. Part one, Causal Tree, will be written by Tim Mensinger, while part two will be done by Florian Schoner.
+In this project we try to understand newly proposed methods for computing heterogenous treatment effects that leverage regression and classification approaches from the machine learning literature. In particular we are interested in the new method *Causal Trees*, first proposed in [*Recursive partitioning for heterogeneous causal effects*](https://www.pnas.org/content/113/27/7353),
+by Susan Athey and Guido Imbens (2016); see reference below. Their method is heavily based upon the famous classification and regression tree algorithm, illustrated in the same-titled book by Breiman et al. (1984); see reference below. The project will be split in two parts. Part one, Causal Tree, will be written by Tim Mensinger, while part two will be done by Florian Schoner.
 
----
+
 ## Causal Tree 
 <a href="https://nbviewer.jupyter.org/github/comet-ml/comet-examples/blob/master/notebooks/Comet-REST-API.ipynb" 
    target="_parent">
@@ -23,7 +23,6 @@ by Susan Athey and Guido Imbens; see reference below. Their method is heavily ba
 
 In this section we will work on a Python implementation of the algorithm `CausalTree.py` as well as on an illustrative notebook. The notebook will contain a concise explaination of the mathematics behind Causal Trees, along with an outlook on the use of more involved algorithms. 
 
----
 ## Simulation Study 
 <a href="https://nbviewer.jupyter.org/github/HumanCapitalAnalysis/student-project-timmens/blob/master/Simulation_Study/First_writeup.ipynb" 
     target="_parent">
@@ -40,9 +39,8 @@ In this section we will work on a Python implementation of the algorithm `Causal
 
 Here we compare common approaches to estimating treatment effects in a homogenous and heterogenous settings. For simulated data we contrast the naive estimator, propensity score weighting, k-NN, OLS, local linear kernel regression and Causal Forests.<sup>1</sup> In Addition, the mentioned methods will be applied to data from a field experiment first considered in *Social Pressure and Voter Turnout: Evidence from a Large-Scale Field Experiment*, by Gerber et al. (2008). 
 
-<font size="2">[1]: Causal Forests refer to the natural extension of Causal Trees, proposed in *Generalized Random Forests* by Susan Athey et al.; see reference below.</font>
+<font size="2">[1]: Causal Forests refer to the natural extension of Causal Trees, proposed in *Generalized Random Forests* by Susan Athey et al. (2019); see reference below.</font>
 
----
 
 ## References
 
