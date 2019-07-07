@@ -1,5 +1,9 @@
 *.html
 
+/.ipynb_checkpoints
+
+/causal_tree/__pycache__
+/causal_tree/missfont.log
 /causal_tree/.idea/
 /causal_tree/venv/
 /causal_tree/.ipynb_checkpoints/
