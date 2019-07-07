@@ -6,9 +6,6 @@ from sklearn.model_selection import KFold
 
 
 class DecisionTree:
-    # 1. make sure that I do not change anything, because numpy uses copy by reference and not copy by value
-    # maybe should use deepcopy more often
-
     def __init__(self, parent=None):
         self._parent = parent
         self._left_child = None
@@ -48,7 +45,6 @@ class DecisionTree:
         return dict.__str__(string_dict)
 
     #  Property and Setter Functions
-    ###################################################################################################################
 
     @property
     def y(self):
@@ -93,7 +89,8 @@ class DecisionTree:
             return self._left_child is None
         else:
             print(
-                "The tree has not been fitted yet, hence it is root and leaf at the same time.\n"
+                "The tree has not been fitted yet, hence it is root and leaf at the "
+                "same time.\n"
             )
             return True
 
@@ -107,8 +104,6 @@ class DecisionTree:
 
     @property
     def number_of_leafs(self):
-        # Because this is a property and not an attribute it gets updated automatically when it is called
-        # however this might be a little inefficient, we will see
         return DecisionTree.get_number_of_leafs(self)
 
     @property
@@ -125,7 +120,6 @@ class DecisionTree:
         return self._branch_loss
 
     # Various Auxiliary Functions
-    ###################################################################################################################
 
     def update_branch_loss(self):
         leaf_list = DecisionTree.get_leafs_in_list(self)
@@ -150,7 +144,6 @@ class DecisionTree:
                 )
 
     # Static Methods (Some of which should probably not be static methods)
-    ###################################################################################################################
 
     @staticmethod
     def get_leafs_in_list(tree):
@@ -225,20 +218,11 @@ class DecisionTree:
 
     @staticmethod
     def get_pruned_tree_and_alpha_sequence(fitted_tree, thresh):
-        #  let tree be the node in question, i.e. tree = t
-        #  then R(t)   = tree.node_loss
-        #       R(T_t) = tree.branch_loss (gets updated automatically when called)
-        #       |T_t|  = tree.number_of_leafs (gets updated automatically when called)
-        #  2. Compute the first Tree, i.e. T_1, set alpha_1 = 0
-        #  3. Construct sequence of trees and alphas.
         assert isinstance(
             fitted_tree, DecisionTree
         ), "This method only works on Decision Trees"
         if not fitted_tree.is_fitted:
-            raise ValueError(
-                "This method only works on fitted trees"
-            )  # here we throw an error instead of using
-            # assert since this error can be solved by fitting the tree and then calling the function again
+            raise ValueError("This method only works on fitted trees")
 
         alphas = [0]
         subtrees = [
@@ -268,7 +252,7 @@ class DecisionTree:
         }  # i think i want: return alphas, subtrees
 
     @staticmethod
-    def get_subtree_corresponding_to_arbitrary_alpha(tree, alpha, thresh):
+    def get_subtree_crspnd_to_abtry_alpha(tree, alpha, thresh):
         sequences = DecisionTree.get_pruned_tree_and_alpha_sequence(tree, thresh)
         alphas = sequences["alphas"]
         subtrees = sequences["subtrees"]
@@ -280,17 +264,13 @@ class DecisionTree:
             return subtrees[index]
 
     @staticmethod
-    def get_optimal_subtree_via_k_fold_cv(
-        X_learn, y_learn, k=5, thresh=0, fitted_tree=None
-    ):
+    def apply_kFold_CV(X_learn, y_learn, k=5, thresh=0, fitted_tree=None):
         try:
             feature_names = X_learn.columns.values
         except AttributeError:
             feature_names = None
 
-        if (
-            fitted_tree is None
-        ):  # Here <<X_learn>> and <<y_learn>> are used to get <<fitted_tree>> if it is passed
+        if fitted_tree is None:
             fitted_tree = DecisionTree()
             fitted_tree.fit(X_learn, y_learn)
         assert len(y_learn) == len(X_learn), (
@@ -329,7 +309,7 @@ class DecisionTree:
         for alpha in alphas:
             err_alpha = 0
             for k, cv_tree in enumerate(tree_k_max_list):
-                cv_alpha_subtree = DecisionTree.get_subtree_corresponding_to_arbitrary_alpha(
+                cv_alpha_subtree = DecisionTree.get_subtree_crspnd_to_abtry_alpha(
                     cv_tree, alpha, thresh
                 )
                 err_alpha += DecisionTree.validate(
@@ -342,14 +322,12 @@ class DecisionTree:
         optimal_index = int(
             np.where(alpha_cv_errors == alpha_cv_errors.min())[0]
         )  # if multiple trees achieve the
-        # same alpha, am I taking the smalles one, what is with 1.5 standard deviations ???
         optimal_subtree = potential_subtrees[optimal_index]
         optimal_subtree.feature_names = feature_names
 
         return optimal_subtree
 
     # Algorithm Implementation and Fitting Functions
-    ###################################################################################################################
 
     def find_best_splitting_point(self, X, y):
 
@@ -368,7 +346,7 @@ class DecisionTree:
             for i in range(self._min_leaf - 1, n - self._min_leaf):
                 # loop through potential splitting points
 
-                xi, yi = sorted_x[i], sorted_y[i]
+                xi = sorted_x[i]
                 if xi == sorted_x[i + 1]:
                     continue
 
@@ -467,7 +445,6 @@ class DecisionTree:
 
 
 #  General Function (Some of which might be static methods in a strict sense)
-#######################################################################################################################
 
 
 def pre_order_traverse_tree(root: DecisionTree, func=None) -> list:
@@ -510,7 +487,8 @@ def coerce_to_ndarray(obj) -> np.ndarray:
     else:
         raise TypeError(
             "Object was given with inappropriate type;"
-            "for matrices and vectors only use pandas Series, DataFrame or Numpy ndarrays"
+            "for matrices and vectors only use pandas Series, DataFrame or "
+            "Numpy ndarrays"
         )
 
 

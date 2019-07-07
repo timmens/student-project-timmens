@@ -12,7 +12,8 @@ dependencies:
 - black 
 - flake8
   #- pytest
-  #- scipy=1.2.1
+- scipy=1.2.1
+- scikit-learn
 - jupyterlab
 - matplotlib
   #- seaborn

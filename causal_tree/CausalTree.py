@@ -6,7 +6,14 @@ from sklearn.model_selection import KFold
 
 
 class CausalTree:
+    """ The CausalTree class fits a Causal Tree to given data and computes (potentially)
+     heterogeneous treatment effects for new data.
+    """
+
     def __init__(self, parent=None):
+        """
+        :param parent: an object of class CausalTree
+        """
         self._parent = parent
         self._left_child = None
         self._right_child = None
@@ -27,6 +34,10 @@ class CausalTree:
         self._cv_error = None
 
     def __str__(self):
+        """ method for representing CausalTree object when called by print / str method
+
+        :return: readable string representation of CausalTree
+        """
         if self._is_fitted is False:
             string_dict = {"Loss": self.branch_loss, "Estimate": self.value}
         elif self._feature_names is not None:
@@ -50,32 +61,42 @@ class CausalTree:
         return dict.__str__(string_dict)
 
     def __repr__(self):
+        """ method for representing CausalTree object when called by evaluating / repr
+
+        :return: unambiguous string representation of CausalTree
+        """
         return f"Causal Tree; fitted = {str(self.is_fitted)}; id = {id(self)}"
 
     #  Property and Setter Functions
 
     @property
     def y(self):
+        """ndarray: 1D array containing outcomes."""
         return self._y
 
     @property
     def y_transformed(self):
+        """ndarray: 1D array containing transformed outcomes"""
         return self._y_transformed
 
     @property
     def treatment_status(self):
+        """ndarray: 1D array containing treatment status of observations"""
         return self._treatment_status
 
     @property
     def parent(self):
+        """CausalTree: Parent node."""
         return self._parent
 
     @property
     def left_child(self):
+        """CausalTree: Left child."""
         return self._left_child
 
     @property
     def right_child(self):
+        """CausalTree: Right child."""
         return self._right_child
 
     @right_child.setter
@@ -88,10 +109,12 @@ class CausalTree:
 
     @property
     def cv_error(self):
+        """float: Cross-validation error of tree with this node as root."""
         return self._cv_error
 
     @property
     def feature_names(self):
+        """ndarray: 1D array containing feature names"""
         return self._feature_names
 
     @feature_names.setter
@@ -101,10 +124,12 @@ class CausalTree:
 
     @property
     def depth(self):
+        """int: Tree depth starting from this node."""
         return CausalTree.detect_tree_depth(self)
 
     @property
     def is_leaf(self):
+        """bool: True if given node is a leaf and false otherwise."""
         if self._is_fitted:
             return self._left_child is None
         else:
@@ -116,54 +141,78 @@ class CausalTree:
 
     @property
     def is_root(self):
+        """bool: True if node is root of tree and false otherwise."""
         return self._parent is None
 
     @property
     def is_fitted(self):
+        """bool: True if method fit was already called without errors, false else."""
         return self._is_fitted
 
     @property
     def number_of_leafs(self):
+        """int: Number of leafs originating from this node."""
         return CausalTree.get_number_of_leafs(self)
 
     @property
     def value(self):
+        """float: Estimated treatment effect using observations contained in this
+         node."""
         return self._value
 
     @property
     def node_loss(self):
+        """float: Estimated loss arising from estimating treatment effects with
+        attribute value on observations contained in this node."""
         return self._node_loss
 
     @property
     def branch_loss(self):
+        """float: Estimated loss arising from summing attribute node_loss of all
+        leafs originating from this node."""
         self.update_branch_loss()
         return self._branch_loss
 
     @property
     def min_leaf(self):
+        """int: Minimum number of observations required in each leaf."""
         return self._min_leaf
 
     @property
     def max_distance(self):
+        """int: Maximum number of absolute difference in observations with treatment
+        and observations without treatment in each leaf."""
         return self._max_distance
 
     @property
     def crit_num_obs(self):
+        """int: Critical value of observations in each leaf: When reached assertion
+        using attribute max_distance is binding."""
         return self._crit_num_obs
 
     # Various Auxiliary Functions
 
     def update_branch_loss(self):
+        """Computes loss in leafs originating from self and updates attribute
+        branch_loss with sum of losses.
+        """
         leaf_list = CausalTree.get_leafs_in_list(self)
         loss_array = np.array([leaf.node_loss for leaf in leaf_list])
         self._branch_loss = np.sum(loss_array)
 
     def output_partition_estimates(self):
+        """Prints treatment effect estimate of each partition (leaf) --Mostly useful for
+        debugging."""
         leaf_list = CausalTree.get_leafs_in_list(self)
         for i, leaf in enumerate(leaf_list):
             print("Leaf {:d}; Estimate: {:3.03f}".format(i, leaf.value))
 
     def splitting_info_to_string(self):
+        """Constructs string encoding information about splitting feature and splitting
+        point of given node.
+
+        :return: str: Splitting information of given node.
+        """
         if self.left_child is None:
             return ""
         else:
@@ -179,6 +228,15 @@ class CausalTree:
 
     @staticmethod
     def transform_outcome(y, treatment_status, p=None):
+        """Transforms outcomes using propensity scores and treatment status, such that
+        expected value of individual outcomes is equal to individual treatment effects.
+        If p=None we implicitly set p=1/2 for all observations.
+
+        :param y: ndarray: 1D array containing outcomes.
+        :param treatment_status: ndarray: 1D array containing treatment status.
+        :param p: ndarray: 1D array containing individual propensity scores.
+        :return: ndarray: 1D array containing transformed outcomes.
+        """
         if treatment_status.dtype != "int":
             treatment_status = np.array(treatment_status, dtype="int")
         if p is None:
@@ -189,6 +247,10 @@ class CausalTree:
 
     @staticmethod
     def get_leafs_in_list(tree):
+        """
+        :param tree: CausalTree.
+        :return: list: Leafs originating from tree.
+        """
         leaf_list = []
         if tree.left_child is None:
             leaf_list.append(tree)
@@ -199,10 +261,24 @@ class CausalTree:
 
     @staticmethod
     def get_number_of_leafs(tree):
+        """
+        :param tree: CausalTree
+        :return: int: Number of leafs originating from tree.
+        """
         return len(CausalTree.get_leafs_in_list(tree))
 
     @staticmethod
     def get_level_in_list(tree, level):
+        """Traverses tree and saves all nodes in a given level in a list.
+        Example:
+            level:
+                0: tree
+                1: [tree.left_child, tree.right_child] (first level)
+
+        :param tree: CausalTree.
+        :param level: int: Number representing desired depth.
+        :return: list: Nodes in given level.
+        """
         #  level: 0 -> root, 1 -> first layer, 2 -> ...
         level_list = []
         if level == 0:
@@ -219,6 +295,11 @@ class CausalTree:
 
     @staticmethod
     def detect_tree_depth(tree):
+        """
+        :param tree: CausalTree.
+        :return: int: Maximum number of nodes to cross when traveling from tree to any
+        leaf originating from tree, i.e. depth of CausalTree starting at node tree.
+        """
         depth_left, depth_right = 0, 0
         if tree.left_child is not None:
             depth_left += 1 + CausalTree.detect_tree_depth(tree.left_child)
@@ -227,6 +308,17 @@ class CausalTree:
 
     @staticmethod
     def validate(tree, X_test, y_transformed_test, metric=None):
+        """Evaluates tree model on testing data given some user specific metric. If
+        metric is None we use standard l2 distance.
+
+        :param tree: CausalTree.
+        :param X_test: ndarray: 2D array containing testing data on features.
+        :param y_transformed_test: ndarray: 1D array containing testing data on
+        transformed outcomes.
+        :param metric: function: User specific metric.
+        :return: float: loss obtained from predicting treatment effects in testing data
+        using tree.
+        """
         #  returns assumed validation metric on predicted and true outcomes
         if metric is None:
 
@@ -240,6 +332,17 @@ class CausalTree:
 
     @staticmethod
     def get_first_subtree(fitted_tree, thresh=None):
+        """This function executes the first step of the pruning process, that is,
+        computing the smallest subtree which has equivalent predictive power as
+        fitted_tree. Starting from the leafs, in-sample loss of parent and leafs
+        are compared where leafs are cut-off if parent loss is smaller than sum of leaf
+        loss minus thresh.
+
+        :param fitted_tree: CausalTree object which already had method fit called.
+        :param thresh: float: Penalizer on larger trees.
+        :return: CausalTree: Subtree of fitted_tree with equivalent in-sample
+        predictive power.
+        """
         subtree = deepcopy(fitted_tree)
         if thresh is None:
             thresh = np.sqrt(np.var(subtree.y)) / 50
@@ -262,12 +365,14 @@ class CausalTree:
 
     @staticmethod
     def get_pruned_tree_and_alpha_sequence(fitted_tree, thresh):
-        #  let tree be the node in question, i.e. tree = t
-        #  then R(t)   = tree.node_loss
-        #       R(T_t) = tree.branch_loss (gets updated automatically when called)
-        #       |T_t|  = tree.number_of_leafs (gets updated automatically when called)
-        #  2. Compute the first Tree, i.e. T_1, set alpha_1 = 0
-        #  3. Construct sequence of trees and alphas.
+        """Implementation of the pruning process. Sequence of increasing cost-complexity
+        parameters and corresponding optimal subtrees of fitted_tree are computed.
+
+        :param fitted_tree: CausalTree object which already had method fit called.
+        :param thresh: float: Penalizer on larger trees.
+        :return: dict: alphas: Increasing list of cost-complexity paramaters.
+                        subtrees: List of subtrees corresponding to alphas.
+        """
         assert isinstance(
             fitted_tree, CausalTree
         ), "This method only works on Decision Trees"
@@ -303,6 +408,14 @@ class CausalTree:
 
     @staticmethod
     def get_subtree_given_alpha(tree, alpha, thresh):
+        """Given a tree and cost-complexity parameter alpha, this function computes
+        the unique optimal subtree of tree corresponding to alpha.
+
+        :param tree: CausalTree.
+        :param alpha: float: Positive cost-complexity parameter.
+        :param thresh: float: Positive penalizer on larger trees.
+        :return: CausalTree: Subtree of tree corresponding to alpha.
+        """
         sequences = CausalTree.get_pruned_tree_and_alpha_sequence(tree, thresh)
         alphas = sequences["alphas"]
         subtrees = sequences["subtrees"]
@@ -314,7 +427,7 @@ class CausalTree:
             return subtrees[index]
 
     @staticmethod
-    def get_optimal_subtree_via_k_fold_cv(
+    def apply_kFold_CV(
         X_learn,
         y_learn,
         treatment_status_learn=None,
@@ -323,6 +436,26 @@ class CausalTree:
         sparsity_bias=1,
         fitted_tree=None,
     ):
+        """This static method computes the optimal causal tree given training data.
+        The tree will be optimal in the sense that it minimizes out-of-sample loss
+        estimated by k-fold cross validation. Since we often prefer sparser models, the
+        function returns the optimal tree as well as an optimal sparse tree, which is
+        computed by the one standard error rule of thumb.
+
+        :param X_learn: ndarray: 2D array of training data on features.
+        :param y_learn: ndarray: 1D array of training data on outcomes.
+        :param treatment_status_learn: ndarray: 1D array of training data on treatment,
+        if not given it is assumed that treatment status is a feature in X_learn.
+        :param k: int: Indicating the number of folds for CV.
+        :param thresh: float: Penalizer for larger trees.
+        :param sparsity_bias: float between 0 and 1: larger number leading to sparser
+        tree
+        :param fitted_tree: CausalTree: Tree fitted using X_learn, y_learn and
+        treatment_status_learn. If equal to none, a new tree is fitted on given data.
+        :return: tuple: optimal_subtree computed via k-fold CV and
+        optimal_sparse_subtree which uses the one standard error rule of thumb of
+        selecting a sparser model.
+        """
         try:
             feature_names = X_learn.columns.values
         except AttributeError:
@@ -407,6 +540,12 @@ class CausalTree:
 
     @staticmethod
     def estimate_treatment_in_leaf(y, treatment_status):
+        """Computes treatment effect for given data y via simple mean differences.
+
+        :param y: ndarray: 1D array containing outcomes of observations
+        :param treatment_status: ndarray: 1D array containing treatment_status
+        :return: float: Treatment effect estimate for given array.
+        """
         if treatment_status.dtype != "bool":
             treatment_status = np.array(treatment_status, dtype="bool")
         y_treat = y[treatment_status]
@@ -414,6 +553,13 @@ class CausalTree:
         return y_treat.mean() - y_untreat.mean()
 
     def is_valid_split(self, sorted_treatment, index):
+        """Checks if a split of sorted_treatment at index index would violate that each
+        new region must not contain too little treated or untreated observations.
+
+        :param sorted_treatment: ndarray: Treatment status sorted beforehand.
+        :param index: int: Splitting index.
+        :return: bool: True if split is valid, False else.
+        """
         sorted_treat_left = sorted_treatment[: (index + 1)]
         sorted_treat_right = sorted_treatment[(index + 1) :]
         valid_left = (
@@ -429,6 +575,12 @@ class CausalTree:
         return valid_left and valid_right
 
     def find_best_splitting_point(self, X):
+        """Standard implementation of the recursive binary splitting algorithm.
+
+        :param X: ndarray: 2D array containing data on features used to find splits.
+        :return: tuple: Feature at which to split the data (split_index), data point of
+        given feature at which to split (split_value) and resulting loss of split.
+        """
         n, p = X.shape
         split_index = None
         split_value = None
@@ -474,6 +626,21 @@ class CausalTree:
     def fit(
         self, X, y, treatment_status=None, min_leaf=8, max_distance=4, crit_num_obs=None
     ):
+        """Uses data X, y and treatment_status to fit a Causal Tree, only restricted by
+        arguments min_leaf, max_distance and crit_num_obs. If treatment_status is None
+        we assume that X is a pandas DataFrame containing a column named
+        "treatment_status".
+
+        :param X: ndarray: 2D array containing data on features.
+        :param y: ndarray: 1D array containing data on outcomes.
+        :param treatment_status: ndarray: 1D array containg data on treatment status.
+        :param min_leaf: int: Minimum number of observations required in each leaf.
+        :param max_distance: int: Maximum number of absolute difference in observations
+        with treatment and observations without treatment in each leaf.
+        :param crit_num_obs: int: Critical value of observations in each leaf: When
+        reached assertion using attribute max_distance is binding.
+        :return: CausalTree: Fitted tree object.
+        """
         # Check Input Values and do stuff for root
         if self.is_root:
             assert min_leaf >= 1, "Parameter <<min_leaf>> has to be bigger than one."
@@ -551,6 +718,10 @@ class CausalTree:
         return self
 
     def predict_row(self, xi):
+        """
+        :param xi: ndarray: 1D array of new data on features of a single observation.
+        :return: float: Treatment prediction conditional on xi.
+        """
         if self.is_leaf:
             return self.value
         child = (
@@ -561,6 +732,10 @@ class CausalTree:
         return child.predict_row(xi)
 
     def predict(self, x):
+        """
+        :param x: ndarray: 2D array containing data on features.
+        :return: ndarray: 1D array containing estimated treatment effects.
+        """
         x = coerce_to_ndarray(x)
         assert (
             self._is_fitted
@@ -572,10 +747,20 @@ class CausalTree:
         return np.array([self.predict_row(xi) for xi in x])
 
 
-#  General Function (Some of which might be static methods in a strict sense)
+#  General Functions (Some of which might be static methods in a strict sense)
 
 
 def pre_order_traverse_tree(root: CausalTree, func=None) -> list:
+    """For many steps of multiple algorithms we need to traverse the tree and apply
+    a function to each node one after the other. This function traverses the tree in a
+    standard pre-order fashion. If func is None we simply append each node to a list and
+    return that, otherwise func is applied before appending.
+
+    :param root: CausalTree: Root node of a tree.
+    :param func: Function that should be applied to nodes while traversing the tree.
+    :return: list: Elements are either nodes given in pre-order or nodes in pre-order
+    with func applied to each one.
+    """
     values = []
     if func is None:
         if root is not None:
@@ -621,6 +806,14 @@ def coerce_to_ndarray(obj) -> np.ndarray:
 
 
 def test_monotonicity_list(lst: list, strictly=True) -> bool:
+    """Test for (strict) monotonicity. In particular we expect the complexity-parameter
+    in the pruning process to be an increasing sequence, which will be tested by this
+    function.
+
+    :param lst: Arbitrary list containing floats.
+    :param strictly: bool: Should strict monotonicity be tested.
+    :return: bool: True if lst is (strict) monotone increasing, False else.
+    """
     if strictly:
         return all(x < y for x, y in zip(lst, lst[1:]))
     else:
@@ -628,6 +821,15 @@ def test_monotonicity_list(lst: list, strictly=True) -> bool:
 
 
 def plot(tree: CausalTree, filename=None, save=False):
+    """Plotting function that nicely visualizes the information contained in the
+    class by creating an (upside-down) tree-like structure plot. Inner nodes contain
+    information on the splitting process of the feature space while leafs contain
+    information on treatment predictions in regions of the partition.
+
+    :param tree: CausalTree: Fitted tree.
+    :param filename: str: Name of file that should be created.
+    :param save: bool: Should the file be saved to disk.
+    """
     if tree.is_fitted is False:
         print("The tree must be fitted in order to be plotted")
         return

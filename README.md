@@ -6,8 +6,9 @@
 In this project we try to understand newly proposed methods for computing heterogenous treatment effects that leverage regression and classification approaches from the machine learning literature. In particular we are interested in the new method *Causal Trees*, first proposed in [*Recursive partitioning for heterogeneous causal effects*](https://www.pnas.org/content/113/27/7353),
 by Susan Athey and Guido Imbens (2016); see reference below. Their method is heavily based upon the famous classification and regression tree algorithm, illustrated in the same-titled book by Breiman et al. (1984); see reference below. The project will be split in two parts. Part one, Causal Tree, will be written by Tim Mensinger, while part two will be done by Florian Schoner.
 
+---
 
-## Causal Tree 
+<font size=5>Causal Tree </font> 
 <a href="https://nbviewer.jupyter.org/github/HumanCapitalAnalysis/student-project-timmens/blob/master/causal_tree/causal_tree.ipynb"
    target="_parent">
    <img align="center" 
@@ -23,7 +24,9 @@ by Susan Athey and Guido Imbens (2016); see reference below. Their method is hea
 
 In this section we will work on a Python implementation of the algorithm (`CausalTree.py`) as well as on an illustrative notebook. The notebook will contain a concise explaination of the mathematics behind Causal Trees, along with an outlook on the use of more involved algorithms. 
 
-## Simulation Study 
+---
+
+<font size=5>Simulation Study</font>
 <a href="https://nbviewer.jupyter.org/github/HumanCapitalAnalysis/student-project-timmens/blob/master/Simulation_Study/First_writeup.ipynb" 
     target="_parent">
     <img align="center" 
