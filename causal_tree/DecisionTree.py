@@ -540,6 +540,7 @@ def plot(tree: DecisionTree, filename=None, save=False):
                     + str(round(float(node.value), 3)),
                 )
                 dot.edge(str(id(node.parent)), str(id(node)))
-    dot.render(view=True)
+    # dot.render(view=True)
     if save:
         dot.save()
+    return dot
