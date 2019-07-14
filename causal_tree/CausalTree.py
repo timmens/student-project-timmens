@@ -746,6 +746,53 @@ class CausalTree:
 
         return np.array([self.predict_row(xi) for xi in x])
 
+    def plot(self, render=False, save=False, filename=None):
+        """Plotting function that nicely visualizes the information contained in the
+        class by creating an (upside-down) tree-like structure plot. Inner nodes contain
+        information on the splitting process of the feature space while leafs contain
+        information on treatment predictions in regions of the partition.
+
+        :param tree: CausalTree: Fitted tree.
+        :param filename: str: Name of file that should be created.
+        :param save: bool: Should the file be saved to disk.
+        """
+        if not self.is_fitted:
+            print("The tree must be fitted in order to be plotted")
+            return
+        if filename is None:
+            filename = "causal_tree.svg"
+        dot = Graph(name="causal_tree", filename=filename, format="svg")
+        dot.node(
+            str(id(self)),
+            self.splitting_info_to_string()
+            + "\nestimate:"
+            + str(round(float(self.value), 3)),
+        )
+        for i in range(self.depth):
+            nodes = CausalTree.get_level_in_list(self, i + 1)
+            for node in nodes:
+                if node.left_child is None:
+                    dot.node(
+                        str(id(node)),
+                        "This node is not split"
+                        + "\nestimate:"
+                        + str(round(float(node.value), 3)),
+                    )
+                    dot.edge(str(id(node.parent)), str(id(node)))
+                else:
+                    dot.node(
+                        str(id(node)),
+                        node.splitting_info_to_string()
+                        + "\nestimate:"
+                        + str(round(float(node.value), 3)),
+                    )
+                    dot.edge(str(id(node.parent)), str(id(node)))
+        if render:
+            dot.render(view=True)
+        if save:
+            dot.save()
+        return dot
+
 
 #  General Functions (Some of which might be static methods in a strict sense)
 
@@ -795,7 +842,9 @@ def g(branch: CausalTree) -> tuple:
 def coerce_to_ndarray(obj) -> np.ndarray:
     if isinstance(obj, np.ndarray):
         return obj
-    elif isinstance(obj, (pd.Series, pd.DataFrame)):
+    elif isinstance(obj, pd.Series):
+        return obj.to_frame().values
+    elif isinstance(obj, pd.DataFrame):
         return obj.values
     else:
         raise TypeError(
@@ -818,50 +867,3 @@ def test_monotonicity_list(lst: list, strictly=True) -> bool:
         return all(x < y for x, y in zip(lst, lst[1:]))
     else:
         return all(x <= y for x, y in zip(lst, lst[1:]))
-
-
-def plot(tree: CausalTree, filename=None, save=False):
-    """Plotting function that nicely visualizes the information contained in the
-    class by creating an (upside-down) tree-like structure plot. Inner nodes contain
-    information on the splitting process of the feature space while leafs contain
-    information on treatment predictions in regions of the partition.
-
-    :param tree: CausalTree: Fitted tree.
-    :param filename: str: Name of file that should be created.
-    :param save: bool: Should the file be saved to disk.
-    """
-    if tree.is_fitted is False:
-        print("The tree must be fitted in order to be plotted")
-        return
-
-    if filename is None:
-        filename = "regression_tree.svg"
-    dot = Graph(name="regression_tree", filename=filename, format="svg")
-    dot.node(
-        str(id(tree)),
-        tree.splitting_info_to_string()
-        + "\nestimate:"
-        + str(round(float(tree.value), 3)),
-    )
-    for i in range(tree.depth):
-        nodes = CausalTree.get_level_in_list(tree, i + 1)
-        for node in nodes:
-            if node.left_child is None:
-                dot.node(
-                    str(id(node)),
-                    "This node is not split"
-                    + "\nestimate:"
-                    + str(round(float(node.value), 3)),
-                )
-                dot.edge(str(id(node.parent)), str(id(node)))
-            else:
-                dot.node(
-                    str(id(node)),
-                    node.splitting_info_to_string()
-                    + "\nestimate:"
-                    + str(round(float(node.value), 3)),
-                )
-                dot.edge(str(id(node.parent)), str(id(node)))
-    dot.render(view=True)
-    if save:
-        dot.save()
