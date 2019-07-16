@@ -21,6 +21,8 @@ dependencies:
 - jupyter_contrib_nbextensions
 - jupyter_nbextensions_configurator
 - pip
+- pip:
+  - graphviz 
 - graphviz
   #- rise
 - r-essentials
