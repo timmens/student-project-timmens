@@ -1,5 +1,6 @@
 import numpy as np
 from matplotlib import pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
 # import matplotlib.pyplot as plt
 from graphviz import Graph
@@ -18,7 +19,7 @@ def plot_figure1(width=8, height=5):
     X1, X2 = np.meshgrid(x, x)
     Y = y(X1, X2)
     fig = plt.figure()
-    ax = plt.axes(projection="3d")
+    ax = plt.axes(projection=Axes3D.name)
 
     ax.view_init(30, 230)
     ax.plot_surface(X1, X2, Y, rstride=1, cstride=1, cmap="viridis", edgecolor="none")
