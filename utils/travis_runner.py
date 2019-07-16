@@ -11,10 +11,10 @@ if __name__ == "__main__":
 
     for subdir in subdirectories:
         if subdir in donotcheckdir:
-            continue
+            next
         for notebook in glob(subdir + "*.ipynb"):
             if notebook in donotchecknb:
-                continue
+                next
             cmd1 = "jupyter nbconvert --execute "
             cmd2 = "{}  --ExecutePreprocessor.timeout=-1".format(notebook)
             cmd = cmd1 + cmd2
