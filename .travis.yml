@@ -22,5 +22,6 @@ install:
   - R CMD INSTALL ICC_2.3.0.tar.gz
 script: 
   - source .envrc 
+  - travis_wait python utils/travis_runner.py
 #  - travis_wait run-notebook
 #  - travis_wait run-slide
