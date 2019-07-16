@@ -4,9 +4,11 @@ import subprocess as sp
 import glob
 
 if __name__ == "__main__":
+    subdirectories = ["causal_tree", "simpsons_paradox", "Simulation_Study"]
 
-    for notebook in glob.glob("*.ipynb"):
-        cmd = "jupyter nbconvert --execute {}  --ExecutePreprocessor.timeout=-1".format(
-            notebook
-        )
-        sp.check_call(cmd, shell=True)
+    for subdir in subdirectories:
+        for notebook in glob.glob(subdir + "/*.ipynb"):
+            cmd1 = "jupyter nbconvert --execute"
+            cmd2 = "{}  --ExecutePreprocessor.timeout=-1".format(notebook)
+            cmd = cmd1 + cmd2
+            sp.check_call(cmd, shell=True)
