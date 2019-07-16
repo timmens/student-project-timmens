@@ -1,13 +1,20 @@
 #!/usr/bin/env python
 """This script manages all tasks for the TRAVIS build server."""
 import subprocess as sp
-import glob
+from glob import glob
 
 if __name__ == "__main__":
-    subdirectories = ["simpsons_paradox"]
+
+    subdirectories = glob("*/")
+    donotcheckdir = ["Simulation_Study"]
+    donotchecknb = ["sandbox.ipynb"]
 
     for subdir in subdirectories:
-        for notebook in glob.glob(subdir + "/*.ipynb"):
+        if subdir in donotcheckdir:
+            continue
+        for notebook in glob(subdir + "*.ipynb"):
+            if notebook in donotchecknb:
+                continue
             cmd1 = "jupyter nbconvert --execute "
             cmd2 = "{}  --ExecutePreprocessor.timeout=-1".format(notebook)
             cmd = cmd1 + cmd2
