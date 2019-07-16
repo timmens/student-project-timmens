@@ -4,7 +4,7 @@ import subprocess as sp
 import glob
 
 if __name__ == "__main__":
-    subdirectories = ["causal_tree", "simpsons_paradox"]
+    subdirectories = ["simpsons_paradox"]
 
     for subdir in subdirectories:
         for notebook in glob.glob(subdir + "/*.ipynb"):
