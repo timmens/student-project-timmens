@@ -6,15 +6,15 @@ from glob import glob
 if __name__ == "__main__":
 
     subdirectories = glob("*/")
-    donotcheckdir = ["Simulation_Study"]
+    donotcheckdir = ["Simulation_Study/", "ARCHIVE/"]
     donotchecknb = ["sandbox.ipynb"]
 
     for subdir in subdirectories:
         if subdir in donotcheckdir:
-            next
+            continue
         for notebook in glob(subdir + "*.ipynb"):
-            if notebook in donotchecknb:
-                next
+            if notebook.split("/", 1)[1] in donotchecknb:
+                continue
             cmd1 = "jupyter nbconvert --execute "
             cmd2 = "{}  --ExecutePreprocessor.timeout=-1".format(notebook)
             cmd = cmd1 + cmd2
