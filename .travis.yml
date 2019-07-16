@@ -16,6 +16,7 @@ install:
     #  - conda config --add channels r
     #  - conda info -a
   - conda env create -f environment.yml 
+  - conda install -c anaconda graphviz 
   - source activate student-project-timmens
 
   - wget https://cran.r-project.org/src/contrib/ICC_2.3.0.tar.gz 
