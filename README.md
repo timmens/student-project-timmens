@@ -23,13 +23,13 @@ by Susan Athey and Guido Imbens (2016); see reference below. Their method is hea
 In this section we will work on a Python implementation of the algorithm (`CausalTree.py`) as well as on an illustrative notebook. The notebook will contain a concise explaination of the mathematics behind Causal Trees, along with an outlook on the use of more involved algorithms. 
 
 ## Simulation Study
-<a href="https://nbviewer.jupyter.org/github/HumanCapitalAnalysis/student-project-timmens/blob/master/Simulation_Study/First_writeup.ipynb" 
+<a href="https://nbviewer.jupyter.org/github/HumanCapitalAnalysis/student-project-timmens/blob/master/Simulation_Study/simulation_study.ipynb" 
     target="_parent">
     <img align="center" 
    src="https://raw.githubusercontent.com/jupyter/design/master/logos/Badges/nbviewer_badge.png" 
        width="109" height="20">
 </a> 
-<a href="https://mybinder.org/v2/gh/HumanCapitalAnalysis/student-project-timmens/master?filepath=Simulation_Study%2FFirst_writeup.ipynb" 
+<a href="https://mybinder.org/v2/gh/HumanCapitalAnalysis/student-project-timmens/master?filepath=Simulation_Study%2Fsimulation_study.ipynb" 
      target="_parent">
      <img align="center" 
         src="https://mybinder.org/badge_logo.svg" 
