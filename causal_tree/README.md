@@ -44,7 +44,7 @@ tree.fit(X, y) # fits tree (but also overfits)
 optimal_tree = tree.apply_kFold_CV(X, y, k=5, fitted_tree=tree)
 
 print(optimal_tree) # displays some relevant information on the tree
-plot(optimal_tree)  # plots tree in a hierachical (upside-down) tree like structure 
+optimal_tree.plot()  # plots tree in a hierachical (upside-down) tree like structure 
 ``` 
 
 ## `CausalTree.py`
@@ -63,7 +63,7 @@ ctree_sparse, ctree_opt = ctree.apply_kFold_CV(X, y, k=5, fitted_tree=ctree) # h
 # and a sparse tree are returned
  
 print(ctree_sparse) # displays some relevant information on the tree
-plot(ctree_sparse)  # plots tree in a hierachical (upside-down) tree like structure 
+ctree_sparse.plot()  # plots tree in a hierachical (upside-down) tree like structure 
 ``` 
 
 ## References
