@@ -47,9 +47,9 @@ C_ols_se5. <- param$C_ols_se5
 C_knn_se5. <- param$C_knn_se5
   
 test <- replicate(N,
-                    sim(n, het_linear., random_assignment.,
-                        non_linearD., np_ps = FALSE, k = k., kC = kC.,
-                        non_linearY., diff_error = TRUE),
+                    sim(n, het_linear = het_linear., random_assignment = random_assignment.,
+                        non_linearD = non_linearD., np_ps = FALSE, k = k., kC = kC.,
+                        non_linearY = non_linearY., diff_error = TRUE),
                     simplify = FALSE)
 for(j in 1:N){test[[j]] <- add_column(test[[j]], id = rep(j, n))}
 test <- bind_rows(test)
