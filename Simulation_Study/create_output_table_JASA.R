@@ -56,7 +56,7 @@ create_output_table_JASA <- function(n, N, d, num_trees, kC,
   C_mean_mse_ols <- mean(C_ols)
   
   
-  system.time( est_C_rf <- dlply(test, .(id), rf_cate_JASA, num_trees, MSE_fun = MSE,
+  system.time( est_C_rf <- dlply(test, .(id), rf_cate_JASA, num_trees,
                                  .progress = "text",
                                  .parallel = para,
                                  .paropts = list(.packages = c("httr", "jsonlite", "dplyr"),
