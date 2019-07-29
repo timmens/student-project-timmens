@@ -1,6 +1,10 @@
 *.html
 
+/ARCHIVE
+
 /.ipynb_checkpoints
+
+/Simulation_Study/*.html
 
 /causal_tree/__pycache__
 /causal_tree/missfont.log
@@ -9,3 +13,4 @@
 /causal_tree/.ipynb_checkpoints/
 /causal_tree/*.svg
 /causal_tree/figure2*
+/causal_tree/*.html
