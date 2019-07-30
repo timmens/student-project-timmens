@@ -23,12 +23,12 @@ sim <- function(n, het_linear, random_assignment, k, kC,
       #for(j in seq_along(x)){trueps[j] <- prt(x[j])}
     }
     else{
-      prt <- function(y){0.8*y + 0.15}
-      trueps <- 0.8*x + 0.15
+      prt <- function(y){0.6*y + 0.2}
+      trueps <- 0.6*x + 0.2
       #prt <- function(y){y}
       #trueps <- x
     }
-    for(j in seq_along(D)){ D[j] <- as.integer(rbinom(1, size=1, prob=prt(x[j])))}
+    for(j in seq_along(D)){ D[j] <- rbinom(1, size=1, prob=prt(x[j]))}
   }
   
   if(non_linearY){
@@ -49,7 +49,8 @@ sim <- function(n, het_linear, random_assignment, k, kC,
       }
     y0 <- gamma0 + gamma1*x + eps0
   }
-  res <- tibble(Y0=y0,Y1=y1,X=x,D=D,Y_obs=rep(0,n),IntXD=x*D, CATE=truecate)
+  inter <- (x-mean(x))*D
+  res <- tibble(Y0=y0,Y1=y1,X=x,D=D,Y_obs=rep(0,n),IntXD=inter, CATE=truecate)
   res$Y_obs[res$D==1] <- res$Y1[res$D==1]
   res$Y_obs[res$D==0] <- res$Y0[res$D==0]
   #propensity score estimation

@@ -1,6 +1,7 @@
 create_output_table <- function(n, N, B, num_trees, k, kC,
                                 het_linear, random_assignment,
                                 non_linearY, non_linearD,
+                                method_ols,
                                 knn_se5, ols_se5, C_ols_se5, C_knn_se5, boot5,
                                 para){
 
@@ -36,7 +37,7 @@ knn_se5. <- param$knn_se5
 method. <- "logit"
 boot5. <- param$boot5
 #OLS
-method_ols. <- "cool"
+method_ols. <- param$method_ols
 ols_se5. <- param$ols_se5
 
 
