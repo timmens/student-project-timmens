@@ -1,5 +1,5 @@
-sim <- function(n, het_linear = FALSE, random_assignment = TRUE, k, kC,
-                non_linearY = FALSE, non_linearD = FALSE, diff_error = TRUE,
+sim <- function(n, het_linear, random_assignment, k, kC,
+                non_linearY, non_linearD, diff_error = TRUE,
                 np_ps = FALSE,
                 gamma0=1, gamma1=3, gamma2=0, gamma3=1,
                 phi0=5, phi1=3, phi1p=5, phi2=0, phi3=5,
@@ -9,7 +9,7 @@ sim <- function(n, het_linear = FALSE, random_assignment = TRUE, k, kC,
   ifelse(diff_error, eps1 <- rnorm(n, mean = 0, sd = sdeps1), eps1 <- eps0)
   #
   if(random_assignment == TRUE){
-    D <- rbinom(n,size=1,prob = 0.5)
+    D <- as.integer(rbinom(n,size=1,prob = 0.5))
     trueps <- rep(0.5,n)
   }
   else{
@@ -28,9 +28,10 @@ sim <- function(n, het_linear = FALSE, random_assignment = TRUE, k, kC,
       #prt <- function(y){y}
       #trueps <- x
     }
-    for(j in seq_along(D)){ D[j] <- rbinom(1, size=1, prob=prt(x[j])) }
+    for(j in seq_along(D)){ D[j] <- as.integer(rbinom(1, size=1, prob=prt(x[j])))}
   }
-  if(non_linearY == TRUE){
+  
+  if(non_linearY){
     nl <- function(z,const,t=1){const+3*z+20*sin(pi*z*t)}
     y1 <- nl(z=x,const=phi0,t=phi3) + eps1
     y0 <- nl(z=x,const=gamma0,t=gamma3) + eps0

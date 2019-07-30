@@ -22,13 +22,13 @@ param <- as.list(match.call())
 N <- as.numeric(param$N)
 n <- as.numeric(param$n)
 B <- as.numeric(param$B)
-num_trees <- as.numeric(param$num_trees)
+num_trees. <- as.numeric(param$num_trees)
 k. <- as.numeric(param$k)
 kC. <- as.numeric(param$kC)
-random_assignment <- param$random_assignment
-non_linearY <- param$non_linearY
-non_linearD <- param$non_linearD
-het_linear <- param$het_linear
+random_assignment. <- param$random_assignment
+non_linearY. <- param$non_linearY
+non_linearD. <- param$non_linearD
+het_linear. <- param$het_linear
 para <- param$para
 
 knn_se5. <- param$knn_se5
@@ -47,9 +47,9 @@ C_ols_se5. <- param$C_ols_se5
 C_knn_se5. <- param$C_knn_se5
   
 test <- replicate(N,
-                    sim(n, het_linear, random_assignment,
-                        non_linearD, np_ps = FALSE, k = k., kC = kC.,
-                        non_linearY, diff_error = TRUE),
+                    sim(n, het_linear = het_linear., random_assignment = random_assignment.,
+                        non_linearD = non_linearD., np_ps = FALSE, k = k., kC = kC.,
+                        non_linearY = non_linearY., diff_error = TRUE),
                     simplify = FALSE)
 for(j in 1:N){test[[j]] <- add_column(test[[j]], id = rep(j, n))}
 test <- bind_rows(test)
