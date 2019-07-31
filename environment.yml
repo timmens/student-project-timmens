@@ -6,6 +6,7 @@ channels:
 - r
 
 dependencies:
+- readline
 - numpy
 - pandas
 - black 
