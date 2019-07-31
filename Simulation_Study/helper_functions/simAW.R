@@ -92,7 +92,8 @@ simAW <- function(n, kC, d, add=FALSE){
   fmla <- as.formula(paste("Y_obs ~ D + ", paste(all, collapse= "+")))
   reslm <- lm(fmla, data = res)
   coef <- matrix(reslm$coefficients[c(allDX, "D")], nrow = d+1, ncol = 1)
-  X <- as.matrix(res[,c(allX, "D")])
+  const <- matrix(rep(1, n), nrow = n, ncol=1)
+  X <- as.matrix(cbind(res[, c(allX)], const))
   C_ols <- as.vector(t(coef)%*%t(X))
   res <- add_column(res, Cate_ols=C_ols)
   #compute true cate
