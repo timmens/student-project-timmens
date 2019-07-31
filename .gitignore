@@ -15,3 +15,4 @@
 /causal_tree/figure2*
 /causal_tree/*.html
 /causal_tree/ARCHIVE/*
+/causal_tree/CausalForest.py
