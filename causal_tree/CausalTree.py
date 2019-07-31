@@ -268,32 +268,6 @@ class CausalTree:
         return len(CausalTree.get_leafs_in_list(tree))
 
     @staticmethod
-    def get_level_in_list(tree, level):
-        """Traverses tree and saves all nodes in a given level in a list.
-        Example:
-            level:
-                0: tree
-                1: [tree.left_child, tree.right_child] (first level)
-
-        :param tree: CausalTree.
-        :param level: int: Number representing desired depth.
-        :return: list: Nodes in given level.
-        """
-        #  level: 0 -> root, 1 -> first layer, 2 -> ...
-        level_list = []
-        if level == 0:
-            level_list.append(tree)
-        else:
-            if tree.left_child is not None:
-                level_list.extend(
-                    CausalTree.get_level_in_list(tree.left_child, level - 1)
-                )
-                level_list.extend(
-                    CausalTree.get_level_in_list(tree.right_child, level - 1)
-                )
-        return level_list
-
-    @staticmethod
     def detect_tree_depth(tree):
         """
         :param tree: CausalTree.
@@ -335,7 +309,7 @@ class CausalTree:
         """This function executes the first step of the pruning process, that is,
         computing the smallest subtree which has equivalent predictive power as
         fitted_tree. Starting from the leafs, in-sample loss of parent and leafs
-        are compared where leafs are cut-off if parent loss is smaller than sum of leaf
+        are compared, where leafs are cut-off if parent loss is smaller than sum of leaf
         loss minus thresh.
 
         :param fitted_tree: CausalTree object which already had method fit called.
@@ -345,19 +319,17 @@ class CausalTree:
         """
         subtree = deepcopy(fitted_tree)
         if thresh is None:
-            thresh = np.sqrt(np.var(subtree.y)) / 50
+            thresh = 0  # np.sqrt(np.var(subtree.y)) / 50
         depth = subtree.depth
         if depth < 1:
             return subtree
         for i in range(depth):
-            for parent_node in CausalTree.get_level_in_list(subtree, depth - i - 1):
+            for parent_node in subtree.get_level_in_list(depth - i - 1):
                 if parent_node.left_child is not None:
-                    parent_node.left_child.update_branch_loss()
-                    parent_node.right_child.update_branch_loss()
                     if (
                         parent_node.node_loss
-                        <= parent_node.left_child.node_loss
-                        + parent_node.right_child.node_loss
+                        <= parent_node.left_child.branch_loss  # gets updated automatic
+                        + parent_node.right_child.branch_loss
                         + thresh
                     ):
                         parent_node.left_child, parent_node.right_child = None, None
@@ -375,7 +347,7 @@ class CausalTree:
         """
         assert isinstance(
             fitted_tree, CausalTree
-        ), "This method only works on Decision Trees"
+        ), "This method only works on CausalTree Trees"
         if not fitted_tree.is_fitted:
             raise ValueError("This method only works on fitted trees")
 
@@ -433,7 +405,7 @@ class CausalTree:
         treatment_status_learn=None,
         k=5,
         thresh=0,
-        sparsity_bias=1,
+        sparsity_bias=0.5,
         fitted_tree=None,
     ):
         """This static method computes the optimal causal tree given training data.
@@ -525,7 +497,7 @@ class CausalTree:
         sparsity_adjustment = sparsity_bias * np.std(alpha_cv_errors)
         optimal_sparse_index = int(
             np.where(
-                alpha_cv_errors < alpha_cv_errors[optimal_index] + sparsity_adjustment
+                alpha_cv_errors <= alpha_cv_errors[optimal_index] + sparsity_adjustment
             )[0][-1]
         )
         optimal_subtree = potential_subtrees[optimal_index]
@@ -550,6 +522,7 @@ class CausalTree:
             treatment_status = np.array(treatment_status, dtype="bool")
         y_treat = y[treatment_status]
         y_untreat = y[~treatment_status]
+        assert len(y_treat) > 0 and len(y_untreat), "Error: Empty Outcome Vector"
         return y_treat.mean() - y_untreat.mean()
 
     def is_valid_split(self, sorted_treatment, index):
@@ -596,7 +569,7 @@ class CausalTree:
                 self.treatment_status[sort_index],
             )
 
-            for i in range(self._min_leaf - 1, n - self._min_leaf):
+            for i in range(self._min_leaf - 1, n - self._min_leaf - 1):
                 # loop through potential splitting points
 
                 xi = sorted_x[i]
@@ -614,8 +587,15 @@ class CausalTree:
                     sorted_y[(i + 1) :], sorted_treatment[(i + 1) :]
                 )
 
-                lhs_loss = np.sum((lhs_treat_effect - sorted_y[: (i + 1)]) ** 2)
-                rhs_loss = np.sum((rhs_treat_effect - sorted_y[(i + 1) :]) ** 2)
+                sorted_transformed_y = CausalTree.transform_outcome(
+                    sorted_y, sorted_treatment
+                )
+                lhs_loss = np.sum(
+                    (lhs_treat_effect - sorted_transformed_y[: (i + 1)]) ** 2
+                )
+                rhs_loss = np.sum(
+                    (rhs_treat_effect - sorted_transformed_y[(i + 1) :]) ** 2
+                )
 
                 tmp_loss = lhs_loss + rhs_loss
                 if tmp_loss < loss:
@@ -717,6 +697,24 @@ class CausalTree:
         self.update_branch_loss()
         return self
 
+    def get_level_in_list(self, level):
+        """Traverses tree and saves all nodes in a given level in a list.
+        Example:
+            level:
+                0: tree
+                1: [tree.left_child, tree.right_child] (first level)
+        :param level: int: Number representing desired depth.
+        :return: list: Nodes in given level.
+        """
+        level_list = []
+        if level == 0:
+            level_list.append(self)
+        else:
+            if self.left_child is not None:
+                level_list.extend(self.left_child.get_level_in_list(level - 1))
+                level_list.extend(self.right_child.get_level_in_list(level - 1))
+        return level_list
+
     def predict_row(self, xi):
         """
         :param xi: ndarray: 1D array of new data on features of a single observation.
@@ -769,7 +767,7 @@ class CausalTree:
             + str(round(float(self.value), 3)),
         )
         for i in range(self.depth):
-            nodes = CausalTree.get_level_in_list(self, i + 1)
+            nodes = self.get_level_in_list(i + 1)
             for node in nodes:
                 if node.left_child is None:
                     dot.node(

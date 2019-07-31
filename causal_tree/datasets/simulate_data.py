@@ -12,5 +12,6 @@ def simulate_data(agents=100):
     y[np.apply_along_axis(all, 1, ~index)] = 2
     y[np.apply_along_axis(lambda boo: boo[0] and not boo[1], 1, index)] = 1
     y[np.apply_along_axis(lambda boo: not boo[0] and boo[1], 1, index)] = 3
+    y += np.random.normal(0, np.sqrt(0.5), size=agents)
 
     return x, y
