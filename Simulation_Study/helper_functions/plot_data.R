@@ -19,8 +19,8 @@ plot_data <- function(n, num_trees, kC,
     
     
     param <- as.list(match.call())
-    n <- as.numeric(param$n)
-    num_trees <- as.numeric(param$num_trees)
+    n. <- as.numeric(param$n)
+    num_trees. <- as.numeric(param$num_trees)
     kC. <- as.numeric(param$kC)
     random_assignment. <- param$random_assignment
     non_linearY. <- param$non_linearY
@@ -29,7 +29,7 @@ plot_data <- function(n, num_trees, kC,
     
       
   
-  df <- sim(n, het_linear = het_linear., random_assignment= random_assignment.,
+  df <- sim(n = n., het_linear = het_linear., random_assignment= random_assignment.,
             non_linearD = non_linearD., np_ps = FALSE, k = 1, kC = kC.,
             non_linearY = non_linearY., diff_error = TRUE)
   df_part <- modelr::resample_partition(df, c(train = 0.5, test = 0.5))
@@ -40,7 +40,7 @@ plot_data <- function(n, num_trees, kC,
   cf <- grf::causal_forest(X = as.matrix(df_train$X),
                            Y = as.matrix(df_train$Y_obs),
                            W = as.matrix(df_train$D),
-                           num.trees = 500, # Make this larger for better acc.
+                           num.trees = num_trees., # Make this larger for better acc.
                            num.threads = 1,
                            honesty = TRUE)
   names(cf)
@@ -59,6 +59,6 @@ plot_data <- function(n, num_trees, kC,
     geom_line(aes(y=tauhatknn, col="k-NN"), size = 1) +
     geom_smooth(aes(y=(Y1-Y0), col="OLS"), method="lm", se = FALSE) + 
     geom_line(aes(y=tauhatx_cf, col="RF"), size=1) + 
-    geom_line(aes(y=CATE), linetype = "dotted", col="black", size = 1.25)
+    geom_line(aes(y=CATE, col="tau(x)"), linetype = "dotted", size = 1.25)
   
 }

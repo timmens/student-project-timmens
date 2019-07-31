@@ -2,7 +2,7 @@ simAW <- function(n, kC, d, add=FALSE){
   D <- rbinom(n, size = 1, prob = 0.5)
   x <- matrix(runif(n*d), n, d)
   Int <- matrix(rep(0,n*d), n, d)
-  for(j in seq_along(D)){Int[j,] <- D[j]*x[j,]}
+  for(j in seq_along(D)){Int[j,] <- D[j]*(x[j,])}
   eps0 <- rnorm(n)
   eps1 <- rnorm(n)
   #generate cate function.
