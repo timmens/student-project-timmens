@@ -294,15 +294,11 @@ class CausalTree:
         using tree.
         """
         #  returns assumed validation metric on predicted and true outcomes
+        tau_pred = tree.predict(X_test)
         if metric is None:
-
-            def metric(pred, true):
-                return np.mean(
-                    (pred - true) ** 2
-                )  # if no metric is given Mean Squared Error is used (MSE)
-
-        y_pred = tree.predict(X_test)
-        return np.sum(metric(y_pred, y_transformed_test))
+            return np.mean((tau_pred - y_transformed_test) ** 2)
+        else:
+            return metric(tau_pred, y_transformed_test)
 
     @staticmethod
     def get_first_subtree(fitted_tree, thresh=None):
@@ -449,7 +445,6 @@ class CausalTree:
             tree_max, thresh
         )
         tree_k_max_list = []  # list of maximal trees in each cross validation sample
-        tree_k_subtree_list = []
         test_X = []
         test_y = []
         test_treatment_status = []
@@ -468,11 +463,6 @@ class CausalTree:
             test_y.append(y_learn[test_index])
             test_treatment_status.append(treatment_status_learn[test_index])
 
-        for tree in tree_k_max_list:
-            tree_k_subtree_list.append(
-                CausalTree.get_pruned_tree_and_alpha_sequence(tree, thresh)
-            )
-
         alphas = tree_max_sequences["alphas"]
         potential_subtrees = tree_max_sequences["subtrees"]
 
@@ -489,8 +479,7 @@ class CausalTree:
                 err_alpha += CausalTree.validate(
                     cv_alpha_subtree, test_X[k], test_y_transformed
                 )
-
-            alpha_cv_errors.append(err_alpha / k)
+            alpha_cv_errors.append(err_alpha)
 
         alpha_cv_errors = np.array(alpha_cv_errors)
         optimal_index = int(np.where(alpha_cv_errors == alpha_cv_errors.min())[0][-1])
