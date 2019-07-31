@@ -24,3 +24,13 @@ dependencies:
 - graphviz
 - r-essentials
 - rpy2
+- r-tidyverse
+- r-doParallel 
+- r-fnn
+- r-sandwich
+- r-plyr
+- r-modelr
+- r-rpart
+- r-grf 
+- r-matching
+- r-boot
