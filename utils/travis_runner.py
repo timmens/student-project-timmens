@@ -7,7 +7,7 @@ if __name__ == "__main__":
 
     subdirectories = glob("*/")
     donotcheckdir = ["utils/"]
-    donotchecknb = []
+    donotchecknb = ["sandbox.ipynb"]
 
     for subdir in subdirectories:
         if subdir in donotcheckdir:
