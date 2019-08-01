@@ -7,7 +7,9 @@ simAW <- function(n, kC, d, add=FALSE){
   eps1 <- rnorm(n)
   #generate cate function.
   tau <- function(x1,x2){
-    (1+(1+exp(-20*(x1-1/3)))^(-1))*(1+(1+exp(-20*(x2-1/3)))^(-1))
+    
+    #(1+(1+exp(-100*(x1-1/50)))^(-1))*(1+(1+exp(-100*(x2-1/50)))^(-1))
+     (1+(1+exp(-20*(x1-1/3)))^(-1))*(1+(1+exp(-20*(x2-1/3)))^(-1))
   }
   if(add){
     betas0 <- matrix(runif(n = d, min = 1, max = 30), nrow = d, ncol = 1)
@@ -31,6 +33,7 @@ simAW <- function(n, kC, d, add=FALSE){
   Int_XD <- as_tibble(Int_XD)
   res <- bind_cols(res, Int_XD)
   res <- add_column(res, D=D, Y0 = y0, Y1 = y1, Y_obs = rep(0,n))
+  res <- add_column(res, taui = y1- y0)
   res$Y_obs[res$D==1] <- res$Y1[res$D==1]
   res$Y_obs[res$D==0] <- res$Y0[res$D==0]
   #logit + probit

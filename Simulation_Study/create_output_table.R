@@ -58,7 +58,7 @@ test <- bind_rows(test)
 
 #NAIVE
 system.time(est_naive <- dlply(test, .(id), naive_ate,
-                               .progress = "text",
+                               .progress = "none",
                                .parallel = para,
                                .paropts = list(.packages = c("httr", "jsonlite", "dplyr"))))
 naive <- as.numeric(map(est_naive, "ATE"))
@@ -90,7 +90,7 @@ mean_se_psw_log_2 <- mean(psw_log_se_2)
 #OLS
 system.time( est_ols <- dlply(test, .(id), ols_ate, method_ols = method_ols., ols_se5 = ols_se5.,
                               myvcov = sandwich::vcovHC,
-                              .progress = "text",
+                              .progress = "none",
                               .parallel = para,
                               .paropts = list(.packages = c("httr", "jsonlite", "dplyr"))))
 ols <- as.numeric(map(est_ols, "ATE"))
@@ -104,7 +104,7 @@ mean_se_ols <- mean(ols_se)
 
 #KNN
 system.time(est_knn <- dlply(test, .(id), knn_ate, knn_se5 = knn_se5., mymatch = Matching::Match, k.,
-                             .progress = "text",
+                             .progress = "none",
                              .parallel = para,
                              .paropts = list(.packages = c("httr", "jsonlite", "dplyr"))))
 knn <- as.numeric(map(est_knn, "ATE"))
@@ -148,7 +148,7 @@ mean_se_rf <- mean(rf_se)
 
 
 system.time( est_C_knn <- dlply(test, .(id), knn_cate, C_knn_se5 = C_knn_se5.,
-                                .progress = "text",
+                                .progress = "none",
                                 .parallel = para,
                                 .paropts = list(.packages = c("httr", "jsonlite", "dplyr"))))
 
@@ -162,7 +162,7 @@ C_mean_se_knn <- mean(C_knn_se)
 
 system.time( est_C_ols <- dlply(test, .(id), ols_cate, vcovmy = sandwich::vcovHC,
                                 C_ols_se5 = C_ols_se5.,
-                                .progress = "text",
+                                .progress = "none",
                                 .parallel = para,
                                 .paropts = list(.packages = c("httr", "jsonlite", "dplyr"))))
 C_ols <- as.numeric(map(est_C_ols, "MSE"))

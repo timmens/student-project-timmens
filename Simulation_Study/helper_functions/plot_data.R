@@ -55,10 +55,10 @@ plot_data <- function(n, num_trees, kC,
   idtest <- df_part$test$idx
   df <- df[idtest, ]
   ggplot(df, aes(x=X), legend = TRUE) +
-    geom_point(aes(y=Y_obs, col=factor(D))) +
+    geom_point(aes(y=Y_obs, col=factor(D)), size=1) +
     geom_line(aes(y=tauhatknn, col="k-NN"), size = 1) +
     geom_smooth(aes(y=(Y1-Y0), col="OLS"), method="lm", se = FALSE) + 
     geom_line(aes(y=tauhatx_cf, col="RF"), size=1) + 
-    geom_line(aes(y=CATE, col="tau(x)"), linetype = "dotted", size = 1.25)
+    geom_line(aes(y=CATE), linetype = "dotted", col="black", size = 1.25)
   
 }
