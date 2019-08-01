@@ -511,7 +511,7 @@ class CausalTree:
             treatment_status = np.array(treatment_status, dtype="bool")
         y_treat = y[treatment_status]
         y_untreat = y[~treatment_status]
-        assert len(y_treat) > 0 and len(y_untreat), "Error: Empty Outcome Vector"
+        assert len(y_treat) > 0 and len(y_untreat) > 0, "Error: Empty Outcome Vector"
         return y_treat.mean() - y_untreat.mean()
 
     def is_valid_split(self, sorted_treatment, index):
@@ -565,30 +565,28 @@ class CausalTree:
                 if xi == sorted_x[i + 1]:
                     continue
 
-                if not self.is_valid_split(sorted_treatment, i):
-                    continue
+                if self.is_valid_split(sorted_treatment, i):
+                    lhs_treat_effect = self.estimate_treatment_in_leaf(
+                        sorted_y[: (i + 1)], sorted_treatment[: (i + 1)]
+                    )
 
-                lhs_treat_effect = self.estimate_treatment_in_leaf(
-                    sorted_y[: (i + 1)], sorted_treatment[: (i + 1)]
-                )
+                    rhs_treat_effect = self.estimate_treatment_in_leaf(
+                        sorted_y[(i + 1) :], sorted_treatment[(i + 1) :]
+                    )
 
-                rhs_treat_effect = self.estimate_treatment_in_leaf(
-                    sorted_y[(i + 1) :], sorted_treatment[(i + 1) :]
-                )
+                    sorted_transformed_y = CausalTree.transform_outcome(
+                        sorted_y, sorted_treatment
+                    )
+                    lhs_loss = np.sum(
+                        (lhs_treat_effect - sorted_transformed_y[: (i + 1)]) ** 2
+                    )
+                    rhs_loss = np.sum(
+                        (rhs_treat_effect - sorted_transformed_y[(i + 1) :]) ** 2
+                    )
 
-                sorted_transformed_y = CausalTree.transform_outcome(
-                    sorted_y, sorted_treatment
-                )
-                lhs_loss = np.sum(
-                    (lhs_treat_effect - sorted_transformed_y[: (i + 1)]) ** 2
-                )
-                rhs_loss = np.sum(
-                    (rhs_treat_effect - sorted_transformed_y[(i + 1) :]) ** 2
-                )
-
-                tmp_loss = lhs_loss + rhs_loss
-                if tmp_loss < loss:
-                    split_index, split_value, loss = var_index, xi, tmp_loss
+                    tmp_loss = lhs_loss + rhs_loss
+                    if tmp_loss < loss:
+                        split_index, split_value, loss = var_index, xi, tmp_loss
 
         return split_index, split_value, loss
 
