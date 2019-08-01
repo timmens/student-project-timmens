@@ -6,7 +6,7 @@ from glob import glob
 if __name__ == "__main__":
 
     subdirectories = glob("*/")
-    donotcheckdir = ["causal_tree/", "ARCHIVE/"]
+    donotcheckdir = ["utils/"]
     donotchecknb = []
 
     for subdir in subdirectories:
