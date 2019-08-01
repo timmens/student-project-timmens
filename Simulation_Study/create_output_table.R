@@ -156,7 +156,7 @@ C_knn <- as.numeric(map(est_C_knn, "MSE"))
 C_knn_se <- as.numeric(map(est_C_knn, "se"))
 
 #tbp
-C_mean_mse_knn <- mean(C_knn)
+C_mean_mse_knn <- mean(C_knn) 
 C_mean_se_knn <- mean(C_knn_se)
 #plot(density(C_knn),xlim=c(0,10))
 
@@ -169,7 +169,7 @@ C_ols <- as.numeric(map(est_C_ols, "MSE"))
 C_ols_se <- as.numeric(map(est_C_ols, "se"))
 
 #tbp
-C_mean_mse_ols <- mean(C_ols)
+C_mean_mse_ols <- mean(C_ols) 
 C_mean_se_ols <- mean(C_ols_se)
 #plot(density(C_ols_se),xlim=c(0,0.5))
 
@@ -186,7 +186,7 @@ C_rf <- as.numeric(map(est_C_rf, "MSE"))
 C_rf_se <- as.numeric(map(est_C_rf, "se"))
 
 #tbp
-C_mean_mse_rf <- mean(C_rf)
+C_mean_mse_rf <- mean(C_rf) 
 C_mean_se_rf <- mean(C_rf_se)
 
 

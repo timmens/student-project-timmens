@@ -49,16 +49,23 @@ plot_data <- function(n, num_trees, kC,
   cf_res <- predict(cf, as.matrix(df_test$X), estimate.variance = TRUE)
   tauhatx_cf <- cf_res$predictions %>% as.numeric()
   
-  
-  
+  reslm <- lm(Y_obs ~ D + X + IntXD, data = df)
+  fitval <- reslm$fitted.values
+  df[, "fitval"] <- reslm$coefficients[2] + df$X * reslm$coefficients[4]
   
   idtest <- df_part$test$idx
   df <- df[idtest, ]
+  #olsx <- sort(df$X)
+  #olsy <- df$fitval[order(df$X)]
   ggplot(df, aes(x=X), legend = TRUE) +
     geom_point(aes(y=Y_obs, col=factor(D)), size=1) +
     geom_line(aes(y=tauhatknn, col="k-NN"), size = 1) +
     geom_smooth(aes(y=(Y1-Y0), col="OLS"), method="lm", se = FALSE) + 
+    #geom_point(aes(y=fitval, col="OLS"), size = 1) + 
     geom_line(aes(y=tauhatx_cf, col="RF"), size=1) + 
-    geom_line(aes(y=CATE), linetype = "dotted", col="black", size = 1.25)
+    geom_line(aes(y=CATE), linetype = "dotted", col="black", size = 1.25) + 
+    scale_x_continuous(breaks = round(seq(0, 1, by = 0.1),1)) + 
+    scale_y_continuous(breaks = round(seq(min(df$Y_obs), max(df$Y_obs), by = 1),0))
+
   
 }
