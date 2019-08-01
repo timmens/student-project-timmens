@@ -20,19 +20,14 @@ def plot_figure1(width=8, height=5):
     Y = y(X1, X2)
     fig = plt.figure()
     ax = plt.axes(projection=Axes3D.name)
-
     ax.view_init(30, 230)
     ax.plot_surface(X1, X2, Y, rstride=1, cstride=1, cmap="viridis", edgecolor="none")
     plt.xlabel("x1", fontsize=20)
     plt.ylabel("x2", fontsize=20)
     fig.suptitle("Figure 1", fontsize=30)
-    #    ax.set_xlabel("x1")
-    #    ax.set_ylabel("x2")
-    #    ax.set_zlabel("y")
-    #    ax.set_title("Figure 1")
-    #    ax.xaxis.label.set_size(40)
-    #    ax.yaxis.label.set_size(40)
-    #    ax.zaxis.label.set_size(40)
+    plt.xticks(fontsize=16, rotation=90)
+    plt.yticks(fontsize=16, rotation=90)
+    # plt.zticks(fontsize=16, rotation=90)
     plt.rcParams["figure.figsize"] = [width, height]
 
 
@@ -58,3 +53,49 @@ def plot_figure2(ratio, width, height):
     dot.edge("rrrc", "rrrlc")
     dot.edge("rrrc", "rrrrc")
     return dot
+
+
+def plot_figure3(width=8, height=5, view_x=60, view_y=230):
+    def tau(x1, x2):
+        tau1 = 0
+        tau2 = 2 * (x1 < 0).astype(int) * (x2 > 0).astype(int)
+        tau3 = 14 * (x1 < 0).astype(int) * (x2 < 0).astype(int)
+        tau4 = -5 * (x1 > 0).astype(int) * (x2 < 0).astype(int)
+        return tau1 + tau2 + tau3 + tau4
+
+    x = np.linspace(-3, 3, 100)
+    X1, X2 = np.meshgrid(x, x)
+    T = tau(X1, X2)
+    fig = plt.figure()
+    ax = plt.axes(projection=Axes3D.name)
+    ax.view_init(view_x, view_y)
+    ax.plot_surface(X1, X2, T, rstride=1, cstride=1, cmap="viridis", edgecolor="none")
+    plt.xlabel("x1", fontsize=20)
+    plt.ylabel("x2", fontsize=20)
+    fig.suptitle("Figure 3", fontsize=30)
+    plt.xticks(fontsize=16, rotation=90)
+    plt.yticks(fontsize=16, rotation=90)
+    # plt.zticks(fontsize=16, rotation=90)
+    plt.rcParams["figure.figsize"] = [width, height]
+
+
+def plot_figure4(width=8, height=5, view_x=60, view_y=230, smoothness=20):
+    def tau(x1, x2):
+        tmp1 = 1 + (1 + np.exp(-smoothness * (x1 - 1 / 3))) ** (-1)
+        tmp2 = 1 + (1 + np.exp(-smoothness * (x2 - 1 / 3))) ** (-1)
+        return tmp1 * tmp2
+
+    x = np.linspace(0, 1, 100)
+    X1, X2 = np.meshgrid(x, x)
+    T = tau(X1, X2)
+    fig = plt.figure()
+    ax = plt.axes(projection=Axes3D.name)
+    ax.view_init(view_x, view_y)
+    ax.plot_surface(X1, X2, T, rstride=1, cstride=1, cmap="viridis", edgecolor="none")
+    plt.xlabel("x1", fontsize=20)
+    plt.ylabel("x2", fontsize=20)
+    fig.suptitle("Figure 4", fontsize=30)
+    plt.xticks(fontsize=16, rotation=90)
+    # plt.zticks(fontsize=16, rotation=90)
+    plt.yticks(fontsize=16, rotation=90)
+    plt.rcParams["figure.figsize"] = [width, height]

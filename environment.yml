@@ -22,6 +22,7 @@ dependencies:
 - pip
 - pip:
   - graphviz 
+  - rpy2
 - graphviz
 - r-essentials
 - rpy2
