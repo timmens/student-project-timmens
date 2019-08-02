@@ -36,3 +36,4 @@ dependencies:
 - r-grf 
 - r-matching
 - r-boot
+- r-lattice
