@@ -1,4 +1,4 @@
-# Simulation Study
+# Simulation Study 
 <a href="https://nbviewer.jupyter.org/github/HumanCapitalAnalysis/student-project-timmens/blob/master/Simulation_Study/simulation_study.ipynb" 
     target="_parent">
     <img align="center" 
@@ -11,6 +11,7 @@
         src="https://mybinder.org/badge_logo.svg" 
         width="109" height="20">
 </a> 
+
 
 
 ## Description
