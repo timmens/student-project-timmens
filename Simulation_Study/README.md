@@ -28,7 +28,7 @@ The illustration will proceed in 3 steps.
       * departing from linearity 
 
 2. d-dimensional feature space: Focus on CATE only
-   1.  k-NN Matching vs. causal forests
+   1.  k-NN Matching vs. causal forests vs. OLS
 
 
 <!--
