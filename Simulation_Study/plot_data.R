@@ -65,7 +65,10 @@ plot_data <- function(n, num_trees, kC,
     geom_line(aes(y=tauhatx_cf, col="RF"), size=1) + 
     geom_line(aes(y=CATE), linetype = "dotted", col="black", size = 1.25) + 
     scale_x_continuous(breaks = round(seq(0, 1, by = 0.1),1)) + 
-    scale_y_continuous(breaks = round(seq(min(df$Y_obs), max(df$Y_obs), by = 1),0))
+    if(non_linearY.){
+    scale_y_continuous(breaks = round(seq(min(df$CATE), max(df$Y_obs), by = 5),0))
+    } 
+   else{scale_y_continuous(breaks = round(seq(min(df$Y_obs), max(df$Y_obs), by = 1),0))}
 
   
 }

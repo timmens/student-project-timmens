@@ -99,6 +99,7 @@ simAW <- function(n, kC, d, add=FALSE){
   X <- as.matrix(cbind(res[, c(allX)], const))
   C_ols <- as.vector(t(coef)%*%t(X))
   res <- add_column(res, Cate_ols=C_ols)
+  #do ols
   #compute true cate
   if(add){res <- add_column(res, CATE = x%*%(betas1-betas0))}
   else{res <- add_column(res, CATE = tau(res$X1, res$X2))}

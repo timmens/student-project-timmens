@@ -6,7 +6,7 @@ ols_cate <- function(data, vcovmy = vcovHC, C_ols_se5 = C_ols_se5.){
   
   data2 <- data %>% dplyr::select(Y_obs, D, X, IntXD, CATE)
   reslm <- lm(Y_obs ~ D + X + IntXD, data = data2)
-  cate_ols <- reslm$coefficients[2] + reslm$coefficients[4]*data2$X
+  cate_ols <- reslm$coefficients[2] + reslm$coefficients[4]*(data2$X - mean(data2$X))
   
   if(C_ols_se5){
     varb <- vcovmy(reslm, type = "const")
