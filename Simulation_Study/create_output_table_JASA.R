@@ -1,4 +1,4 @@
-create_output_table_JASA <- function(n, N, d, num_trees, kC,
+create_output_table_JASA <- function(n, N, d, num_trees, kC, lambda,
                                    para = FALSE, C_knn_se5 = FALSE ){
 
 #source("simAW.R")
@@ -14,6 +14,7 @@ create_output_table_JASA <- function(n, N, d, num_trees, kC,
   d <- as.numeric(param$d)
   num_trees <- as.numeric(param$num_trees)
   kC <- as.numeric(param$kC)
+  lambda <- param$lambda
   para <- param$para
   if(para == TRUE){
     nodes <- detectCores()
@@ -26,7 +27,7 @@ create_output_table_JASA <- function(n, N, d, num_trees, kC,
   
   
   system.time(test <- replicate(n = N,
-                                simAW(n, kC, d, add = FALSE),
+                                simAW(n, kC, d, lambda, add = FALSE),
                                 simplify = FALSE))
   for(j in 1:N){test[[j]] <- add_column(test[[j]], id = rep(j, n))}
   test <- bind_rows(test)
