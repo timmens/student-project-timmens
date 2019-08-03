@@ -14,31 +14,17 @@
 
 
 
-## Description
-This simulation study will use different data generating processes to illustrate the importance of heterogeneous treatment effects. I'll start out with settings that can be tackled with off-the-shelf estimation techniques and will gradually increase the level of sophistication inherent to the settings to work out the benefits of using causal trees/forests. The latter exercise builds upon the first part of our joint project by Tim, and will be conducted using simulated data. For the (C)ATE, the estimation routines to be compared include:  The Naive estimator, Propensity Score Weighting, k-NN matching, OLS, and causal forests.
+## Abstract
+This part of the project is concerned with a simulation study that aims at illustrating the importance of heterogeneous treatment effects. The study will use different data generating processes and involve estimation methods such as Ordinary Least Squares, Propensity Score Weighting, k-Nearest-Neighbor Matching, and Causal Forests.
+We'll start out with settings that are more favorable to off-the-shelf estimation techniques and will test causal forests on these more "traditional" setups.
+Subsequently we will gradually increase the level of diffculty inherent to the settings to work out the benefits of using causal forests over the other methods.
 
-The illustration will proceed in 3 steps.
-
+The simulation study can proceeds in two steps:
 
 1. One-dimensional feature space
-   1. No Heterogeneity
-      * Unconfoundedness vs. random treatment assignment
-   2. Heterogeneity in one dimension only
-      * develop intuition for the problem: CATE vs. ATE
-      * departing from linearity 
+   1. Unconfoundedness vs. random treatment assignment
+   2. Average Treatment Effect vs. Conditional Average Treatment Effect - When does the distinction matter?
 
-2. d-dimensional feature space: Focus on CATE only
-   1.  k-NN Matching vs. causal forests vs. OLS
-
-
-<!--
- 3. Data from a randomized experiment <a name="myfootnote1">1</a>: Gerber, Green, and Larimer (2008)'s paper "Social Pressure and[//]: #  Voter Turnout: Evidence from a Large-Scale Field Experiment" (http://isps.yale.edu/sites/default/files/publication/2012/12/ISPS08-001.pdf)
- <br>
-1. compare all of the previously discussed methods)
-  <br>
- 2. visualize heterogeneity in treatment effects.
--->
-
-
-
-
+2. d-dimensional feature space
+   1.  Smoothness as a parameter 
+   2. Performance in high dimensions

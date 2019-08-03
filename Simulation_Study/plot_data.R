@@ -59,10 +59,10 @@ plot_data <- function(n, num_trees, kC,
   #olsy <- df$fitval[order(df$X)]
   ggplot(df, aes(x=X), legend = TRUE) +
     geom_point(aes(y=Y_obs, col=factor(D)), size=1) +
-    geom_line(aes(y=tauhatknn, col="k-NN"), size = 1) +
+    geom_line(aes(y=tauhatknn, col="kNN"), size = 1) +
     geom_smooth(aes(y=(Y1-Y0), col="OLS"), method="lm", se = FALSE) + 
     #geom_point(aes(y=fitval, col="OLS"), size = 1) + 
-    geom_line(aes(y=tauhatx_cf, col="RF"), size=1) + 
+    geom_line(aes(y=tauhatx_cf, col="CF"), size=1) + 
     geom_line(aes(y=CATE), linetype = "dotted", col="black", size = 1.25) + 
     scale_x_continuous(breaks = round(seq(0, 1, by = 0.1),1)) + 
     if(non_linearY.){
