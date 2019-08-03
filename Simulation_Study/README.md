@@ -30,7 +30,7 @@ The simulation study proceeds in two steps:
    2. Performance in high dimensions
 
 ## Code Examples
-In both parts we'll mainly rely on two functions. The first one returns two tables of results that let you compare the different estimators. The other function enables you to graphically explore the properties of the data generating process you have specified.
+In both parts we'll mainly rely on two functions. The first one returns table(s) of results that let you compare the different estimators. The other function enables you to graphically explore the properties of the data generating process you have specified.
 
 
 ```R
