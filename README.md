@@ -36,7 +36,7 @@ In this section we will work on a Python implementation of the algorithm (`Causa
         width="109" height="20">
 </a> 
 
-Here we compare common approaches to estimating treatment effects settings with and without heterogeneity in treatment effects. For simulated data we compare the naive estimator, propensity score weighting, k-NN, OLS, and Causal Forests.<sup>1</sup> 
+Here we compare common approaches to estimating treatment effects in settings with and without heterogeneity in treatment effects. For simulated data we compare the naive estimator, propensity score weighting, k-NN, OLS, and Causal Forests.<sup>1</sup> 
 
 <font size="2">[1]: Causal Forests refer to the natural extension of Causal Trees, proposed in *Generalized Random Forests* by Susan Athey et al. (2019); see reference below.</font>
 
