@@ -22,10 +22,8 @@ Subsequently we will gradually increase the level of diffculty inherent to the s
 The simulation study can proceeds in two steps:
 
 1. One-dimensional feature space
-   1. No Heterogeneity
-      * Unconfoundedness vs. random treatment assignment
-   2. Heterogeneity in one dimension only
-      * Average Treatment Effect vs. Conditional Average Treatment Effect - When does the distinction matter?
+   1. Unconfoundedness vs. random treatment assignment
+   2. Average Treatment Effect vs. Conditional Average Treatment Effect - When does the distinction matter?
 
 2. d-dimensional feature space
    1.  Smoothness as a parameter 
