@@ -19,14 +19,14 @@ This part of the project is concerned with a simulation study that aims at illus
 We'll start out with settings that are more favorable to off-the-shelf estimation techniques and will test causal forests on these more "traditional" setups.
 Subsequently we will gradually increase the level of diffculty inherent to the settings to work out the benefits of using causal forests over the other methods.
 
-The simulation study can proceeds in two steps:
+The simulation study proceeds in two steps:
 
 1. One-dimensional feature space
    1. Unconfoundedness vs. random treatment assignment
    2. Average Treatment Effect vs. Conditional Average Treatment Effect - When does the distinction matter?
 
 2. d-dimensional feature space
-   1.  Smoothness as a parameter 
+   1. Smoothness as a parameter 
    2. Performance in high dimensions
 
 ## Code Examples
