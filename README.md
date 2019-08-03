@@ -65,7 +65,6 @@ This folder contains the submission to the Python challenge.
 
 * ***Generalized Random Forests***, Susan Athey, Julie Tibshirani and Stefan Wager; <font size="2">(Ann. Statist.; Volume 47, Number 2 (2019), 1148-1178.)</font>
 
-* ***Social Pressure and Voter Turnout: Evidence from a Large-Scale Field Experiment***, Gerber, Green and Larimer;  <font size="2">(American Political Science Review (2008) 102(1): 33-48.)</font>
 
 ---
 [//]: <> (Comment: Badges for Travis CI, MIT License and Black Code Style)
