@@ -29,16 +29,26 @@ The simulation study can proceeds in two steps:
    1.  Smoothness as a parameter 
    2. Performance in high dimensions
 
-## One-dimensional feature space
-In the first part, we'll mainly rely on two functions. The first one outputs a table of results which lets you compare different estimators. The other function enables you to graphically explore the properties of the data generating process you have specified.
+## Code Examples
+In both parts we'll mainly rely on two functions. The first one returns two tables of results that let you compare the different estimators. The other function enables you to graphically explore the properties of the data generating process you have specified.
 
 
 ```R
-create_output_table()
-#generates the data according to the parameters you have specified,
-performs all the estimations, and returns two tables
+#First part#
+create_output_table(n = 500, N = 500, B = 500, k = 1, kC = 50, num_trees = 100,...)
+#generates data according to the parameters specified,
+#performs estimations, and returns two tables
 
-plot_data()
+plot_data(n=500, num_trees=100, kC=50,...)
 #generates a single dataset from the input parameters, and
-performs the estimations and returns a single ggplot
+#performs the estimations and returns a single plot
+
+#Second part#
+create_output_table_JASA(n = 2000, N = 20, d = 8, num_trees = 500, kC = 20, lambda=20,...)
+#generates data according to the parameters specified,
+#performs estimations, and returns two tables
+
+
+plot_AW(lambda = 20)
+#plots a 2-dimensional function whose shape depends on the parameter you can choose
 ``` 
