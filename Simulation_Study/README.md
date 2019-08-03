@@ -35,8 +35,10 @@ In the first part, we'll mainly rely on two functions. The first one outputs a t
 
 ```R
 create_output_table()
-#generates the data according to the parameters you have specified, performs all the estimations, and returns two tables
+#generates the data according to the parameters you have specified,
+performs all the estimations, and returns two tables
 
 plot_data()
-#generates a single dataset from the input parameters, performs the estimations and returns a single ggplot
+#generates a single dataset from the input parameters, and
+performs the estimations and returns a single ggplot
 ``` 
