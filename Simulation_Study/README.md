@@ -28,3 +28,15 @@ The simulation study can proceeds in two steps:
 2. d-dimensional feature space
    1.  Smoothness as a parameter 
    2. Performance in high dimensions
+
+## One-dimensional feature space
+In the first part, we'll mainly rely on two functions. The first one outputs a table of results which lets you compare different estimators. The other function enables you to graphically explore the properties of the data generating process you have specified.
+
+
+```R
+create_output_table()
+#generates the data according to the parameters you have specified, performs all the estimations, and returns two tables
+
+plot_data()
+#generates a single dataset from the input parameters, performs the estimations and returns a single ggplot
+``` 
