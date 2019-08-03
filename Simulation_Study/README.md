@@ -15,7 +15,7 @@
 
 
 ## Abstract
-This part of the project is concerned with a simulation study that aims at illustrating the importance of heterogeneous treatment effects. The study will use different data generating processes and involve estimation methods such as Ordinary Least Squares, Propensity Score Weighting, k-Nearest-Neighbor Matching, and Causal Forests.
+This part of the project is concerned with a simulation study that aims at illustrating the importance of heterogeneous treatment effects. The study will use different data generating processes and involve estimation methods such as Ordinary Least Squares, Propensity Score Weighting, k-Nearest-Neighbor Matching, and Causal Forests ([Athey et al. (2019)](https://projecteuclid.org/euclid.aos/1547197251)).
 We'll start out with settings that are more favorable to off-the-shelf estimation techniques and will test causal forests on these more "traditional" setups.
 Subsequently we will gradually increase the level of diffculty inherent to the settings to work out the benefits of using causal forests over the other methods.
 
@@ -52,3 +52,7 @@ create_output_table_JASA(n = 2000, N = 20, d = 8, num_trees = 500, kC = 20, lamb
 plot_AW(lambda = 20)
 #plots a 2-dimensional function whose shape depends on the parameter you can choose
 ``` 
+
+
+## References
+* ***Generalized Random Forests***, Susan Athey, Julie Tibshirani and Stefan Wager; <font size="2">(Ann. Statist.; Volume 47, Number 2 (2019), 1148-1178.)</font>
