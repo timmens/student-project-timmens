@@ -20,7 +20,7 @@ by Susan Athey and Guido Imbens (2016); see reference below. Their method is hea
        width="109" height="20">
 </a> 
 
-In this section we will work on a Python implementation of the algorithm (`CausalTree.py`) as well as on an illustrative notebook. The notebook will contain a concise explaination of the mathematics behind Causal Trees, along with an outlook on the use of more involved algorithms. 
+In this section we will work on a Python implementation of the algorithm (`CausalTree.py`) as well as on an illustrative notebook. The notebook will contain a concise explanation of the mathematics behind Causal Trees, along with an outlook on the use of more involved algorithms. 
 
 ## Simulation Study
 <a href="https://nbviewer.jupyter.org/github/HumanCapitalAnalysis/student-project-timmens/blob/master/Simulation_Study/simulation_study.ipynb" 
@@ -36,7 +36,7 @@ In this section we will work on a Python implementation of the algorithm (`Causa
         width="109" height="20">
 </a> 
 
-Here we compare common approaches to estimating treatment effects in a homogenous and heterogenous settings. For simulated data we contrast the naive estimator, propensity score weighting, k-NN, OLS, local linear kernel regression and Causal Forests.<sup>1</sup> In Addition, the mentioned methods will be applied to data from a field experiment first considered in *Social Pressure and Voter Turnout: Evidence from a Large-Scale Field Experiment*, by Gerber et al. (2008). 
+Here we compare common approaches to estimating treatment effects settings with and without heterogeneity in treatment effects. For simulated data we compare the naive estimator, propensity score weighting, k-NN, OLS, and Causal Forests.<sup>1</sup> 
 
 <font size="2">[1]: Causal Forests refer to the natural extension of Causal Trees, proposed in *Generalized Random Forests* by Susan Athey et al. (2019); see reference below.</font>
 
