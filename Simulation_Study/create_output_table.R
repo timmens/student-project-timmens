@@ -222,13 +222,13 @@ res_knn_cate <- c(C_mean_mse_knn, C_mean_se_knn)
 res_rf_cate <- c(C_mean_mse_rf, C_mean_se_rf)
 
 res_df_ate <- data.frame(Description = rownames_ate, Naive = res_naive_ate, OLS = res_ols_ate,
-                         PSW = res_psw_log_ate, k_NN = res_knn_ate, RF = res_rf_ate)
+                         PSW = res_psw_log_ate, k_NN = res_knn_ate, CF = res_rf_ate)
 disp1 <- format(res_df_ate, justify = "right", digit = 4, width = 10, trim = TRUE)
 
 
 rownames_cate <- c("avg_mse", "avg_mean_se")
 res_df_cate <- data.frame(Description = rownames_cate, OLS = res_ols_cate,
-                          k_NN = res_knn_cate, RF = res_rf_cate)
+                          k_NN = res_knn_cate, CF = res_rf_cate)
 disp2 <- format(res_df_cate, justify = "right", digit = 4, width = 10, trim = TRUE)
 return(list(ATE = disp1, CATE = disp2))
 }
