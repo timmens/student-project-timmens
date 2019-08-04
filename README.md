@@ -1,5 +1,8 @@
 # Student Project - Tim Mensinger and Florian Schoner
 
+## Important Notice 
+
+The Travis CI build sometimes fails because of the `CausalTree.py` file. The details can be seen in the Travis CI log and are also stated in the second issue on this github page. There it can also be seen that all notebooks from the folder **Simulation Study** run without errors. The errors occur only sometimes since we work with newly simulated datasets at most places. It has been tried to solve the issue; as of right now a pass from Travis CI does not mean that the error is gone.
 
 ## Abstract
 

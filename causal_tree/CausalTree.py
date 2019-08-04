@@ -524,9 +524,13 @@ class CausalTree:
         """
         sorted_treat_left = sorted_treatment[: (index + 1)]
         sorted_treat_right = sorted_treatment[(index + 1) :]
-        if np.sum(sorted_treat_right) + np.sum(sorted_treat_left) == 0:
+        if np.sum(sorted_treat_right) == 0:
             return False
-        if np.sum(1 - sorted_treat_right) + np.sum(1 - sorted_treat_left) == 0:
+        if np.sum(sorted_treat_left) == 0:
+            return False
+        if np.sum(1 - sorted_treat_left) == 0:
+            return False
+        if np.sum(1 - sorted_treat_right) == 0:
             return False
         valid_left = (
             len(sorted_treat_left) > self.crit_num_obs
