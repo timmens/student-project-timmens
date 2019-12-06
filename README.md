@@ -32,7 +32,7 @@ In this section we will work on a Python implementation of the algorithm (`Causa
    src="https://raw.githubusercontent.com/jupyter/design/master/logos/Badges/nbviewer_badge.png" 
        width="109" height="20">
 </a> 
-<a href="https://mybinder.org/v2/gh/fschoner/student-project-timmens/master?filepath=https%3A%2F%2Fgithub.com%2Ffschoner%2Fstudent-project-timmens%2Fblob%2Fmaster%2FSimulation_Study%2Fsimulation_study.ipynb" 
+<a href="https://mybinder.org/v2/gh/fschoner/student-project-timmens/7fdeaf57c738241a707622456361a4ac6534b258" 
      target="_parent">
      <img align="center" 
         src="https://mybinder.org/badge_logo.svg" 
